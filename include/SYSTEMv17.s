@@ -1,5 +1,5 @@
 #########################################################################
-# Rotina de tratamento de excecao e interrupcao		v1.5		#
+# Rotina de tratamento de excecao e interrupcao		v1.6a		#
 # Lembre-se: Os ecalls originais do Rars possuem precedencia sobre	#
 # 	     estes definidos aqui					#
 # Os ecalls 1XX usam o BitMap Display e Keyboard Display MMIO Tools	#
@@ -11,7 +11,7 @@
 ######### Verifica se eh a DE1-SoC ###############
 .macro DE1(%salto)
 	li tp, 0x10008000			# carrega tp = 0x10008000
-	bne gp,tp,%salto			# Na DE1 gp = 0 ! Nï¿½o tem segmento .extern
+	bne gp,tp,%salto			# Na DE1 gp = 0 ! Não tem segmento .extern
 .end_macro
 
 
@@ -67,9 +67,11 @@
 .eqv InterLOW		0xFF200708
 .eqv InterHIGH		0xFF20070C
 
+.eqv FDIVIDER		0xFF200710
+
 .data
 
-
+.align 2
 
 
 # Tabela de caracteres desenhados segundo a fonte 8x8 pixels do ZX-Spectrum
@@ -139,7 +141,7 @@ NumInfP:		.string "+Infinity"
 NumInfN:		.string "-Infinity"
 NumNaN:			.string "NaN"
 
-# tabela de causar de exceï¿½ï¿½es 
+# tabela de causar de exceções 
 Cause0: 		.string "Error: 0 Instruction address misaligned "
 Cause1: 		.string "Error: 1 Instruction access fault "
 Cause2: 		.string "Error: 2 Ilegal Instruction "
@@ -160,9 +162,9 @@ Instr:  		.string "Instr: "
 .text
 
 
-###### Devem ser colocadas aqui as identificaï¿½ï¿½es das interrupï¿½ï¿½es e exceï¿½ï¿½es ###
+###### Devem ser colocadas aqui as identificações das interrupções e exceções ###
 
-	csrrwi zero,66,1	# caso ocorra dropdown vai gerar exceï¿½ï¿½o de instruï¿½ï¿½o invï¿½lida
+	csrrwi zero,66,1	# caso ocorra dropdown vai gerar exceção de instrução inválida
 
 exceptionHandling:	addi 	sp, sp, -8 	# salva 2 registradores utilizados para comparar ucause
 	sw 	t0, 0(sp)
@@ -171,18 +173,18 @@ exceptionHandling:	addi 	sp, sp, -8 	# salva 2 registradores utilizados para com
 	csrrw 	s10, 66, zero 			# le o ucause e salva em s10
 	
 	li 	t0, 8
-	bne 	t0, s10, errorExceptions  	# Nï¿½o ï¿½ ecall - nem precisa arrumar a pilha!
+	bne 	t0, s10, errorExceptions  	# Não é ecall - nem precisa arrumar a pilha!
 
-	lw 	t0, 0(sp)			# ï¿½ ecall
+	lw 	t0, 0(sp)			# É ecall
     	lw 	s10, 4(sp)  			# recupera registradores usados
     	addi 	sp, sp, 8			
 	j 	ecallException
 	
 ######################################################
-###############   Exceï¿½ï¿½es de Erros   ################
+###############   Exceções de Erros   ################
 ######################################################
 
-errorExceptions: csrrw 	s11, 67, zero 	# le o utval da exceï¿½ï¿½o e salva em s11	
+errorExceptions: csrrw 	s11, 67, zero 	# le o utval da exceção e salva em s11	
 	addi 	a0, zero, 0xc0 		## printa tela de azul
 	addi 	a1, zero, 0
 	addi 	a7, zero, 148
@@ -290,7 +292,7 @@ End_utval:	li 	a1, 0
 		jal 	printHex
 	
 
-End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exceï¿½ï¿½o ocorreu
+End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exceção ocorreu
 		li 	a1, 0
 		li 	a2, 12
 		li 	a3, 0x000c0ff
@@ -302,12 +304,12 @@ End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exceï¿½ï¿½o ocorreu
 		li 	a3, 0x0000c0ff
 		jal 	printHex	
 		
-		j goToExit 		# encerra execuï¿½ï¿½o
+		j goToExit 		# encerra execução
 
 
 
 ######################################################
-#############   exceï¿½ï¿½o de ECALL   ###################
+#############   exceção de ECALL   ###################
 ######################################################
 ecallException:   addi    sp, sp, -264              # Salva todos os registradores na pilha
     sw     x1,    0(sp)
@@ -440,7 +442,7 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
     beq     t0, a7, goToSleep
     addi    t0, zero, 132             # ecall 32 = sleep
     beq     t0, a7, goToSleep
-
+    
     addi    t0, zero, 36	      # ecall 36 = print int unsigned
     beq     t0, a7, goToPrintIntUnsigned
     addi    t0, zero, 136	      # ecall 36 = print int unsigned
@@ -475,13 +477,18 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
     beq     t0, a7, goToBRES
     addi    t0, zero, 147              # ecall 47 = DrawLine
     beq     t0, a7, goToBRES    
+    
+    addi    t0, zero, 46              # ecall 47 = DrawLine
+    beq     t0, a7, goToFDIV
+    addi    t0, zero, 146              # ecall 47 = DrawLine
+    beq     t0, a7, goToFDIV        
 
 	## end execution ##
 	goToExit:   	DE1(goToExitDE2)	# se for a DE1 pula
 		li 	a7, 10			# chama o ecall normal do Rars
 		ecall				# exit ecall
 			
-	goToExitDE2:	j 	goToExitDE2		# trava o processador : Nï¿½o tem sistema operacional!
+	goToExitDE2:	j 	goToExitDE2		# trava o processador : Não tem sistema operacional!
 
 	goToPrintInt:	jal     printInt               	# chama printInt
 		j       endEcall
@@ -532,9 +539,10 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
 		j       endEcall
 
 	goToBRES:	jal     BRESENHAM               # chama BRESENHAM
-		j       endEcall    		
-
-    		    				    		    				    		    		
+		j       endEcall    	
+		
+ 	goToFDIV:	jal	FDIVISOR 	              # chama Leitura do divisor de frequencias
+		j       endEcall      		    				    		    				    		    		
 
 endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha
 		lw	x2,   4(sp)	
@@ -920,7 +928,7 @@ loopreadString: beq 	a1, a3, fimreadString   	# buffer cheio fim
 
 		li 	tp, 0x08			
 		bne	t6, tp, PulaBackSpace		# Se nao for BACKSPACE
-		beq	zero, a3, loopreadString	# Se nï¿½o tem nenhum caractere no buffer apenas volta a ler
+		beq	zero, a3, loopreadString	# Se não tem nenhum caractere no buffer apenas volta a ler
 		addi	a3, a3, -1			# diminui contador
 		addi 	a0, a0, -1			# diminui endereco do buffer
 		sb 	zero, 0(a0)			# coloca zero no caractere anterior
@@ -1205,8 +1213,8 @@ intprintFloat:		fmul.s 		ft4, ft4, ft2		# ajusta o numero
 			fsub.s		ft4, ft4, ft7		# tira 0.5, dessa forma sempre ao converter estaremos fazendo floor
 		  	fcvt.w.s	t0, ft4			# coloca floor de ft4 em t0
 			fadd.s		ft4, ft4, ft7		# readiciona 0.5
-		  	addi 		t0, t0, 48		# converte para ascii
-		  	sb 		t0, 0(s0)		# coloca no buffer
+			addi 		t0, t0, 48		# converte para ascii			
+			sb 		t0, 0(s0)		# coloca no buffer
 		  	addi 		s0, s0, 1		# incrementta o buffer
 		  
 		  	# imprime parte fracionaria
@@ -1226,7 +1234,14 @@ loopfracprintFloat:  	beq 		t1, zero, fimfracprintFloat	# fim dos digitos?
 			fsub.s		ft5, ft5, ft7			# tira 0.5
 			fcvt.w.s	t0, ft5				# coloca floor de ft5 em 10
 		  	addi 		t0, t0, 48			# converte para ascii
-		  	sb 		t0, 0(s0)			# coloca no buffer
+		  	
+			li 		tp, 48
+			blt		t0, tp, pulaprtFloat1	# testa se eh menor que '0'
+			li		tp, 57
+			ble		t0, tp, pulaprtFloat2	# testa se eh menor ou igual que '9'
+pulaprtFloat1:		li		t0, 48			# define como '0'		  			  	
+		  	
+pulaprtFloat2:	  	sb 		t0, 0(s0)			# coloca no buffer
 		  	addi 		s0, s0, 1			# incrementa endereco
 		  	addi 		t1, t1, -1			# decrementa contador
 			fadd.s		ft5, ft5, ft7			# reincrementa 0.5
@@ -1485,8 +1500,7 @@ fimreadFloat: 	lw 	ra, 0(sp)		# recupera ra
 #  a0    =    TimerLOW                 	   #
 #  a1    =    TimerHIGH	                   #
 ############################################
-time:
-	DE1(timeDE2)
+time:  DE1(timeDE2)
 
 	li 	a7,30				# Chama o ecall do Rars
 	ecall
@@ -1504,8 +1518,7 @@ fimTime: 	ret				# retorna
 #  Sleep                            	   #
 #  a0    =    Tempo em ms             	   #
 ############################################
-sleep:
-	DE1(sleepDE2)
+sleep:  DE1(sleepDE2)
 
 	li 	a7, 32				# Chama o ecall do Rars
 	ecall			
@@ -1562,13 +1575,12 @@ loop2printIntUnsigned:	lw 	t2, 0(sp)			# le digito da pilha
 fimprintIntUnsigned:	ret					# retorna
 		
 
-
 ############################################
 #  Random                            	   #
 #  a0    =    numero randomico        	   #
 ############################################
-random:	
-	DE1(randomDE2)
+
+random:	 DE1(randomDE2)
 
 	li 	a7,41			# Chama o ecall do Rars
 	ecall	
@@ -1700,5 +1712,24 @@ PULA4BRES: 	slli 	t6, t0, 1		# 2*dy
 		bne 	t5, a3, LOOPx2BRES
 		ret		
 
+############################################
+#  FDIVIDER                            	   #
+#  fa0    =    Frequencia em MHz       	   #
+#  a0     =    divisor			   #
+############################################
+FDIVISOR:#	DE1(fdivDE2)
 
-
+	#	li 	 t0, 50			# finge ser 50MHz
+	#	li 	 a0, 1			# divisor=1
+	#	fcvt.s.w fa0, t0		# converte 50 em float
+	#	j 	 fimFDIV			# saida
+	
+fdivDE2:	li 	 t0, FDIVIDER		# carrega endereco do FDIVIDER
+		lw 	 a0, 0(t0)		# le a word em t0	No Rars le 0
+		bne 	 a0, zero, PULAFDIV 	# se a0=0
+		li 	 a0, 32			# faz divisor a0=32
+PULAFDIV:	fcvt.s.w ft1, a0		# converte em float
+		li 	 t0, 50			# frequencia base = 50MHz
+		fcvt.s.w ft0, t0		# converte em float
+		fdiv.s   fa0, ft0, ft1		# 50/divisor
+fimFDIV:	ret				# retorna
