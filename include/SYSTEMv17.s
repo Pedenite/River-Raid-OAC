@@ -523,7 +523,7 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
 	goToMidiOutSync: jal     midiOutSync   		# chama MIDIoutSync
 		j       endEcall
 
-	goToTime:	jal     time                    # chama time
+	goToTime:	jal     Time                    # chama time
 		j       endEcall
 
 	goToSleep:	jal     sleep                  	# chama sleep
@@ -1500,7 +1500,7 @@ fimreadFloat: 	lw 	ra, 0(sp)		# recupera ra
 #  a0    =    TimerLOW                 	   #
 #  a1    =    TimerHIGH	                   #
 ############################################
-time:  DE1(timeDE2)
+Time:  DE1(timeDE2)
 
 	li 	a7,30				# Chama o ecall do Rars
 	ecall

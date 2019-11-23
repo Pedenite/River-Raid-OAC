@@ -7,8 +7,8 @@
 
 .text
 MAPA:	li t1,0xFF000000	# endereco inicial da Memoria VGA - Frame 0
-	li t2,0xFF012C00	# endereco final 
-	li t3,0xd1d1d1d1	# cor água
+	li t2,0xFF00E100	# endereco inicial do menu 
+	li t3,0x91919191	# cor água
 	li t4,0x63636363	# cor chão
 	li t5,-1		# contador
 	li t6,leftBound
