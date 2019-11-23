@@ -7,6 +7,7 @@
 .include "include/plane.data"
 .include "include/plane_l.data"
 .include "include/plane_r.data"
+.include "include/menu.data"
 
 .text
 MAIN:
@@ -21,11 +22,15 @@ MAIN:
 	li s4, 1		# vidas
 	li s5, 0		# pontos
 	
-	jal MENU
+	la a0, menu
+	li a1, 180
+	li a2, 0
+	jal SetPixels
 
 GAMELOOP:
 	beq s4, zero, GAME_OVER
 	jal MAPA		# desenha mapa
+	
 	la a0, plane
 	li a1, 160		# altura
 	li a2, 160		# posição 
@@ -37,9 +42,11 @@ PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado
 	la a0, plane_r
 	addi s2, s2, VelPlane
 PULA2:	jal SetPixels		# Desenha avião
+
 	jal ControlaVida
 	li s3,0
-	jal KEY2		# recebe input do teclado			
+	jal KEY2		# recebe input do teclado
+				
 	li a0,16   
 	li a7,132
 	ecall			# sleep 16ms

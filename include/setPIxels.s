@@ -1,6 +1,6 @@
 #################################################################
 # Set Pixels							#
-# Função pega um arquivo convertido de .bmp para .s		#
+# Função pega um arquivo convertido de .bmp para .data		#
 # a0 = endereço do que será desenhado				#
 # a1 = altura a desenhar					#
 # a2 = distancia à esquerda a desenhar				#
