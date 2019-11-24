@@ -7,6 +7,8 @@
 .include "include/plane.data"
 .include "include/plane_l.data"
 .include "include/plane_r.data"
+.include "include/explosion1.data"
+.include "include/bullet.data"
 .include "include/menu.data"
 
 .text
@@ -21,6 +23,8 @@ MAIN:
 	li s3, 0		# tecla pressionada
 	li s4, 1		# vidas
 	li s5, 0		# pontos
+	li s6, 0		# tiro
+	li s11, 32		# ascii <space>
 	
 	la a0, menu
 	li a1, 180
@@ -30,6 +34,9 @@ MAIN:
 GAMELOOP:
 	beq s4, zero, GAME_OVER
 	jal MAPA		# desenha mapa
+	#beq s6, zero, SemTiro
+	
+	#bgt 
 	
 	la a0, plane
 	li a1, 160		# altura
@@ -43,6 +50,14 @@ PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado
 	addi s2, s2, VelPlane
 PULA2:	jal SetPixels		# Desenha avião
 
+	bne s3, s11, PULA3
+	la a0, bullet
+	li a1, 160
+	li a2, 166
+	add a2, a2, s2
+	mv s6, a2
+	jal SetPixels
+PULA3:
 	jal ControlaVida
 	li s3,0
 	jal KEY2		# recebe input do teclado
@@ -51,12 +66,16 @@ PULA2:	jal SetPixels		# Desenha avião
 	li a7,132
 	ecall			# sleep 16ms
 j GAMELOOP
-GAME_OVER:	li a7, 10
+GAME_OVER:	la a0, explosion1
+		li a1, 160
+		li a2, 160
+		add a2, a2, s2
+		jal SetPixels
+		li a7, 10
 		ecall
 
 .include "include/SetPixels.s"
 .include "include/teclado.s"
 .include "include/controlaVida.s"
 .include "include/mapa.s"
-.include "include/menu.s"
 .include "include/SYSTEMv17.s"
