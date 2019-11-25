@@ -4,10 +4,11 @@ Projeto final de OAC UnB 2019/2 - Jogo River Raid em Assembly RV32IMF
 - Cor do aviao = 0x76 = 118
 - Cor da terra = 0x63 = 99
 - Cor do menu = 0xa4 = 164
+- Frequência na FPGA (PIPELINE): dividida por 4
 
 ## Checklist
 - [x] Uso do processador RISC-V ISA RV32IMF
-- [ ] Uso do teclado e controle analógico
+- [x] Uso do teclado e controle analógico
 - [ ] Efeitos sonoros e música
 - [ ] Tela inicial
 - [ ] Pontuação
