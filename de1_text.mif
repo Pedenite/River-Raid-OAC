@@ -4,1260 +4,1290 @@ ADDRESS_RADIX = HEX;
 DATA_RADIX = HEX;
 CONTENT
 BEGIN
-00000000 : 00000217;   % 14: 	la tp,exceptionHandling	# carrega em tp o endereço base das rotinas do sistema ECALL %
-00000001 : 1a420213;   % 14:  %
-00000002 : 00521073;   % 15:  	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereço tp %
-00000003 : 0000e073;   % 16:  	csrrsi zero,0,1 	# seta o bit de habilitação de interrupção em ustatus (reg 0)	 %
-00000004 : 06100413;   % 18: 	li s0, 97		# ascii a %
-00000005 : 06400493;   % 19: 	li s1, 100		# ascii d %
-00000006 : 00000913;   % 20: 	li s2, 0		# deslocamento do aviao %
-00000007 : 00000993;   % 21: 	li s3, 0		# tecla pressionada %
-00000008 : 00100a13;   % 22: 	li s4, 1		# vidas %
-00000009 : 00000a93;   % 23: 	li s5, 0		# pontos %
-0000000a : 02000d93;   % 24: 	li s11, 32		# ascii <space> %
-0000000b : 0fc10517;   % 26: 	la a0, menu %
-0000000c : 1e850513;   % 26:  %
-0000000d : 0b400593;   % 27: 	li a1, 180 %
-0000000e : 00000613;   % 28: 	li a2, 0 %
-0000000f : 068000ef;   % 29: 	jal SetPixels %
-00000010 : 040a0e63;   % 32: 	beq s4, zero, GAME_OVER %
-00000011 : 0fc000ef;   % 33: 	jal MAPA		# desenha mapa %
-00000012 : 0fc10517;   % 35: 	la a0, plane %
-00000013 : fb850513;   % 35:  %
-00000014 : 0a000593;   % 36: 	li a1, 160		# altura %
-00000015 : 0a000613;   % 37: 	li a2, 160		# posição  %
-00000016 : 01260633;   % 38: 	add a2, a2, s2		# deslocamento %
-00000017 : 00899863;   % 39: 	bne s3, s0, PULA1	# verifica se 'a' está pressionado %
-00000018 : 0fc10517;   % 40: 	la a0, plane_l %
-00000019 : 06050513;   % 40:  %
-0000001a : ffd90913;   % 41: 	addi s2, s2, -3 %
-0000001b : 00999863;   % 42: PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado %
-0000001c : 0fc10517;   % 43: 	la a0, plane_r %
-0000001d : 0e450513;   % 43:  %
-0000001e : 00390913;   % 44: 	addi s2, s2, 3 %
-0000001f : 028000ef;   % 45: PULA2:	jal SetPixels		# Desenha avião %
-00000020 : 0a0000ef;   % 47: 	jal ControlaVida %
-00000021 : 00000993;   % 48: 	li s3,0 %
-00000022 : 07c000ef;   % 49: 	jal KEY2		# recebe input do teclado %
-00000023 : 01000513;   % 51: 	li a0,16    %
-00000024 : 08400893;   % 52: 	li a7,132 %
-00000025 : 00000073;   % 53: 	ecall			# sleep 16ms %
-00000026 : fa9ff06f;   % 54: j GAMELOOP %
-00000027 : 00a00893;   % 55: GAME_OVER:	li a7, 10 %
-00000028 : 00000073;   % 56: 		ecall %
-00000029 : ff0002b7;   % 10: SetPixels:	li t0, 0xff000000 %
-0000002a : 00028293;   % 10:  %
-0000002b : 14000313;   % 11: 		li t1, 320 %
-0000002c : 026585b3;   % 12: 		mul a1, a1, t1		# Calcula a altura %
-0000002d : 00b282b3;   % 13: 		add t0, t0, a1		# Soma altura ao endereço inicial %
-0000002e : 00c282b3;   % 14: 		add t0, t0, a2		# Soma posição ao endereço inicial %
-0000002f : 00052383;   % 15: 		lw t2, 0(a0)		# largura do objeto %
-00000030 : 00452e03;   % 16: 		lw t3, 4(a0)		# altura do objeto %
-00000031 : 03c30333;   % 17: 		mul t1, t1, t3		 %
-00000032 : 00530333;   % 18: 		add t1, t1, t0		# Calcula endereço final da imagem %
-00000033 : 00538eb3;   % 19: 		add t4, t2, t0		# Calcula endereço final da linha %
-00000034 : 00850513;   % 20: 		addi a0, a0, 8		# Pega o primeiro pixel da figura %
-00000035 : 0262d663;   % 21: LOOP1:		bge t0, t1, FORA1 %
-00000036 : 01d28c63;   % 22: LOOP2:		beq t0, t4, FORA2 %
-00000037 : 00054e03;   % 23: 		lbu t3, 0(a0) %
-00000038 : 01c28023;   % 24: 		sb t3, 0(t0) %
-00000039 : 00128293;   % 25: 		addi t0, t0, 1 %
-0000003a : 00150513;   % 26: 		addi a0, a0, 1 %
-0000003b : fedff06f;   % 27: 		j LOOP2 %
-0000003c : 140e8e93;   % 28: FORA2:		addi t4, t4, 320 %
-0000003d : 407282b3;   % 29: 		sub t0, t0, t2 %
-0000003e : 14028293;   % 30: 		addi t0, t0, 320 %
-0000003f : fd9ff06f;   % 31: 		j LOOP1 %
-00000040 : 00008067;   % 32: FORA1:		ret %
-00000041 : ff200337;   % 2: KEY2:	li t1,0xFF200000		# carrega o endereço de controle do KDMMIO %
-00000042 : 00030313;   % 2:  %
-00000043 : 00032283;   % 3: 	lw t0,0(t1)			# Le bit de Controle Teclado %
-00000044 : 0012f293;   % 4: 	andi t0,t0,0x0001		# mascara o bit menos significativo %
-00000045 : 00028463;   % 5:    	beq t0,zero,FIM   	   	# Se não há tecla pressionada então vai para FIM %
-00000046 : 00432983;   % 6:   	lw s3,4(t1)  			# le o valor da tecla tecla %
-00000047 : 00008067;   % 7: FIM:	ret %
-00000048 : 04000293;   % 8: ControlaVida:	li t0, 64		# limite esquerda %
-00000049 : 10000313;   % 9: 		li t1, 256		# limite direita %
-0000004a : 00564863;   % 10: 		blt a2, t0, MORTE %
-0000004b : 00e60613;   % 11: 		addi a2, a2, 14		# largura do avião %
-0000004c : 00c34463;   % 12: 		bgt a2, t1, MORTE %
-0000004d : 0080006f;   % 13: 		j AINDAVIVO %
-0000004e : fffa0a13;   % 14: MORTE:		addi s4, s4, -1 %
-0000004f : 00008067;   % 15: AINDAVIVO:	ret %
-00000050 : ff000337;   % 9: MAPA:	li t1,0xFF000000	# endereco inicial da Memoria VGA - Frame 0 %
-00000051 : 00030313;   % 9:  %
-00000052 : ff00e3b7;   % 10: 	li t2,0xFF00DFC0	# endereco inicial do menu  %
-00000053 : fc038393;   % 10:  %
-00000054 : 91919e37;   % 11: 	li t3,0x91919191	# cor água %
-00000055 : 191e0e13;   % 11:  %
-00000056 : 63636eb7;   % 12: 	li t4,0x63636363	# cor chão %
-00000057 : 363e8e93;   % 12:  %
-00000058 : fff00f13;   % 13: 	li t5,-1		# contador %
-00000059 : 01000f93;   % 14: 	li t6,16 %
-0000005a : 04000513;   % 15: 	li a0,64 %
-0000005b : 05000593;   % 16: 	li a1,80 %
-0000005c : 02730663;   % 17: LOOP: 	beq t1,t2,FORA		# Se for o último endereço então sai do loop %
-0000005d : 001f0f13;   % 18: 	addi t5,t5,1 %
-0000005e : 02bf6633;   % 19: 	rem a2,t5,a1 %
-0000005f : 01f64a63;   % 20: 	blt a2,t6,TERRA %
-00000060 : 00a65863;   % 21: 	bge a2,a0,TERRA %
-00000061 : 01c32023;   % 22: AGUA:	sw t3,0(t1)		# escreve a word na memória VGA %
-00000062 : 00430313;   % 23: 	addi t1,t1,4		# soma 4 ao endereço %
-00000063 : fe5ff06f;   % 24: 	j LOOP			# volta a verificar %
-00000064 : 01d32023;   % 25: TERRA:	sw t4,0(t1) %
-00000065 : 00430313;   % 26: 	addi t1,t1,4 %
-00000066 : fd9ff06f;   % 27: 	j LOOP %
-00000067 : 00008067;   % 28: FORA:	ret %
-00000068 : 0420d073;   % 167: 	csrrwi zero,66,1	# caso ocorra dropdown vai gerar exceção de instrução inválida %
-00000069 : ff810113;   % 169: exceptionHandling:	addi 	sp, sp, -8 	# salva 2 registradores utilizados para comparar ucause %
-0000006a : 00512023;   % 170: 	sw 	t0, 0(sp) %
-0000006b : 01a12223;   % 171: 	sw 	s10, 4(sp) %
-0000006c : 04201d73;   % 173: 	csrrw 	s10, 66, zero 			# le o ucause e salva em s10 %
-0000006d : 00800293;   % 175: 	li 	t0, 8 %
-0000006e : 01a29a63;   % 176: 	bne 	t0, s10, errorExceptions  	# Não é ecall - nem precisa arrumar a pilha! %
-0000006f : 00012283;   % 178: 	lw 	t0, 0(sp)			# É ecall %
-00000070 : 00412d03;   % 179:     	lw 	s10, 4(sp)  			# recupera registradores usados %
-00000071 : 00810113;   % 180:     	addi 	sp, sp, 8			 %
-00000072 : 1e00006f;   % 181: 	j 	ecallException %
-00000073 : 04301df3;   % 187: errorExceptions: csrrw 	s11, 67, zero 	# le o utval da exceção e salva em s11	 %
-00000074 : 0c000513;   % 188: 	addi 	a0, zero, 0xc0 		## printa tela de azul %
-00000075 : 00000593;   % 189: 	addi 	a1, zero, 0 %
-00000076 : 09400893;   % 190: 	addi 	a7, zero, 148 %
-00000077 : 014010ef;   % 191: 	jal 	clsCLS %
-00000078 : 00000293;   % 194: End_Cause0:	li 	t0, 0 %
-00000079 : 03a29263;   % 195: 		bne 	t0, s10, End_Cause1 %
-0000007a : 0fc15517;   % 196: 		la 	a0, Cause0 %
-0000007b : 1a050513;   % 196:  %
-0000007c : 00000593;   % 197: 		li 	a1, 0 %
-0000007d : 00100613;   % 198: 		li 	a2, 1 %
-0000007e : 0000c6b7;   % 199: 		li 	a3, 0x0000c0ff %
-0000007f : 0ff68693;   % 199:  %
-00000080 : 698000ef;   % 200: 		jal	printString %
-00000081 : 16c0006f;   % 201: 		j	End_uepc %
-00000082 : 00100293;   % 204: End_Cause1:	li 	t0, 1 %
-00000083 : 03a29263;   % 205: 		bne 	t0, s10, End_Cause2 %
-00000084 : 0fc15517;   % 206: 		la 	a0, Cause1 %
-00000085 : 1a150513;   % 206:  %
-00000086 : 00000593;   % 207: 		li 	a1, 0 %
-00000087 : 00100613;   % 208: 		li 	a2, 1 %
-00000088 : 0000c6b7;   % 209: 		li 	a3, 0x0000c0ff %
-00000089 : 0ff68693;   % 209:  %
-0000008a : 670000ef;   % 210: 		jal 	printString	 %
-0000008b : 1440006f;   % 211: 		j	End_uepc %
-0000008c : 00200293;   % 214: End_Cause2:	li 	t0, 2 %
-0000008d : 03a29663;   % 215: 		bne 	t0, s10, End_Cause4 %
-0000008e : 0fc15517;   % 216: 		la 	a0, Cause2 %
-0000008f : 19c50513;   % 216:  %
-00000090 : 00000593;   % 217: 		li 	a1, 0 %
-00000091 : 00100613;   % 218: 		li 	a2, 1 %
-00000092 : 0000c6b7;   % 219: 		li 	a3, 0x0000c0ff %
-00000093 : 0ff68693;   % 219:  %
-00000094 : 648000ef;   % 220: 		jal 	printString %
-00000095 : 0fc15517;   % 222: 		la 	a0, Instr %
-00000096 : 23850513;   % 222:  %
-00000097 : 0e80006f;   % 223: 		j	End_utval %
-00000098 : 00400293;   % 226: End_Cause4:	addi 	t0, zero, 4 %
-00000099 : 03a29663;   % 227: 		bne	t0, s10, End_Cause5 %
-0000009a : 0fc15517;   % 228: 		la 	a0, Cause4 %
-0000009b : 18950513;   % 228:  %
-0000009c : 00000593;   % 229: 		li 	a1, 0 %
-0000009d : 00100613;   % 230: 		li 	a2, 1 %
-0000009e : 0000c6b7;   % 231: 		li 	a3, 0x0000c0ff %
-0000009f : 0ff68693;   % 231:  %
-000000a0 : 618000ef;   % 232: 		jal	printString %
-000000a1 : 0fc15517;   % 234: 		la 	a0, Addrs %
-000000a2 : 20050513;   % 234:  %
-000000a3 : 0b80006f;   % 235: 		j	End_utval %
-000000a4 : 00500293;   % 238: End_Cause5:	li 	t0, 5 %
-000000a5 : 03a29663;   % 239: 		bne 	t0, s10, End_Cause6 %
-000000a6 : 0fc15517;   % 240: 		la 	a0, Cause5 %
-000000a7 : 17b50513;   % 240:  %
-000000a8 : 00000593;   % 241: 		li 	a1, 0 %
-000000a9 : 00100613;   % 242: 		li 	a2, 1 %
-000000aa : 0000c6b7;   % 243: 		li 	a3, 0x0000c0ff %
-000000ab : 0ff68693;   % 243:  %
-000000ac : 5e8000ef;   % 244: 		jal 	printString	 %
-000000ad : 0fc15517;   % 246: 		la 	a0, Addrs %
-000000ae : 1d050513;   % 246:  %
-000000af : 0880006f;   % 247: 		j	End_utval %
-000000b0 : 00600293;   % 250: End_Cause6:	li 	t0, 6 %
-000000b1 : 03a29663;   % 251: 		bne 	t0, s10, End_Cause7 %
-000000b2 : 0fc15517;   % 252: 		la 	a0, Cause6 %
-000000b3 : 16750513;   % 252:  %
-000000b4 : 00000593;   % 253: 		li 	a1, 0 %
-000000b5 : 00100613;   % 254: 		li 	a2, 1 %
-000000b6 : 0000c6b7;   % 255: 		li 	a3, 0x0000c0ff %
-000000b7 : 0ff68693;   % 255:  %
-000000b8 : 5b8000ef;   % 256: 		jal 	printString %
-000000b9 : 0fc15517;   % 258: 		la 	a0, Addrs %
-000000ba : 1a050513;   % 258:  %
-000000bb : 0580006f;   % 259: 		j	End_utval %
-000000bc : 00700293;   % 262: End_Cause7:	li 	t0, 7 %
-000000bd : 03a29663;   % 263: 		bne 	t0, s10, End_CauseD %
-000000be : 0fc15517;   % 264: 		la 	a0, Cause7 %
-000000bf : 15a50513;   % 264:  %
-000000c0 : 00000593;   % 265: 		li 	a1, 0 %
-000000c1 : 00100613;   % 266: 		li 	a2, 1 %
-000000c2 : 0000c6b7;   % 267: 		li 	a3, 0x0000c0ff %
-000000c3 : 0ff68693;   % 267:  %
-000000c4 : 588000ef;   % 268: 		jal 	printString %
-000000c5 : 0fc15517;   % 270: 		la 	a0, Addrs %
-000000c6 : 17050513;   % 270:  %
-000000c7 : 0280006f;   % 271: 		j	End_utval %
-000000c8 : 0fc15517;   % 274: End_CauseD: 	la 	a0, CauseD %
-000000c9 : 14f50513;   % 274:  %
-000000ca : 00000593;   % 275: 		li 	a1, 0 %
-000000cb : 00100613;   % 276: 		li 	a2, 1 %
-000000cc : 0000c6b7;   % 277: 		li 	a3, 0x0000c0ff %
-000000cd : 0ff68693;   % 277:  %
-000000ce : 560000ef;   % 278: 		jal 	printString %
-000000cf : 0fc15517;   % 280: 		la 	a0, Addrs %
-000000d0 : 14850513;   % 280:  %
-000000d1 : 00000593;   % 283: End_utval:	li 	a1, 0 %
-000000d2 : 01800613;   % 284: 		li 	a2, 24 %
-000000d3 : 0000c6b7;   % 285: 		li 	a3, 0x000c0ff %
-000000d4 : 0ff68693;   % 285:  %
-000000d5 : 544000ef;   % 286: 		jal	printString %
-000000d6 : 01b00533;   % 288: 		mv 	a0, s11 %
-000000d7 : 03800593;   % 289: 		li 	a1, 56 %
-000000d8 : 01800613;   % 290: 		li 	a2, 24 %
-000000d9 : 0000c6b7;   % 291: 		li 	a3, 0x0000c0ff %
-000000da : 0ff68693;   % 291:  %
-000000db : 4b8000ef;   % 292: 		jal 	printHex %
-000000dc : 0fc15517;   % 295: End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exceção ocorreu %
-000000dd : 10f50513;   % 295:  %
-000000de : 00000593;   % 296: 		li 	a1, 0 %
-000000df : 00c00613;   % 297: 		li 	a2, 12 %
-000000e0 : 0000c6b7;   % 298: 		li 	a3, 0x000c0ff %
-000000e1 : 0ff68693;   % 298:  %
-000000e2 : 510000ef;   % 299: 		jal 	printString %
-000000e3 : 04101573;   % 301: 		csrrw 	a0, 65, zero	 %
-000000e4 : 01c00593;   % 302: 		li	a1, 28 %
-000000e5 : 00c00613;   % 303: 		li 	a2, 12 %
-000000e6 : 0000c6b7;   % 304: 		li 	a3, 0x0000c0ff %
-000000e7 : 0ff68693;   % 304:  %
-000000e8 : 484000ef;   % 305: 		jal 	printHex	 %
-000000e9 : 2500006f;   % 307: 		j goToExit 		# encerra execução %
-000000ea : ef810113;   % 314: ecallException:   addi    sp, sp, -264              # Salva todos os registradores na pilha %
-000000eb : 00112023;   % 315:     sw     x1,    0(sp) %
-000000ec : 00212223;   % 316:     sw     x2,    4(sp) %
-000000ed : 00312423;   % 317:     sw     x3,    8(sp) %
-000000ee : 00412623;   % 318:     sw     x4,   12(sp) %
-000000ef : 00512823;   % 319:     sw     x5,   16(sp) %
-000000f0 : 00612a23;   % 320:     sw     x6,   20(sp) %
-000000f1 : 00712c23;   % 321:     sw     x7,   24(sp) %
-000000f2 : 00812e23;   % 322:     sw     x8,   28(sp) %
-000000f3 : 02912023;   % 323:     sw     x9,   32(sp) %
-000000f4 : 02a12223;   % 324:     sw     x10,  36(sp) %
-000000f5 : 02b12423;   % 325:     sw     x11,  40(sp) %
-000000f6 : 02c12623;   % 326:     sw     x12,  44(sp) %
-000000f7 : 02d12823;   % 327:     sw     x13,  48(sp) %
-000000f8 : 02e12a23;   % 328:     sw     x14,  52(sp) %
-000000f9 : 02f12c23;   % 329:     sw     x15,  56(sp) %
-000000fa : 03012e23;   % 330:     sw     x16,  60(sp) %
-000000fb : 05112023;   % 331:     sw     x17,  64(sp) %
-000000fc : 05212223;   % 332:     sw     x18,  68(sp) %
-000000fd : 05312423;   % 333:     sw     x19,  72(sp) %
-000000fe : 05412623;   % 334:     sw     x20,  76(sp) %
-000000ff : 05512823;   % 335:     sw     x21,  80(sp) %
-00000100 : 05612a23;   % 336:     sw     x22,  84(sp) %
-00000101 : 05712c23;   % 337:     sw     x23,  88(sp) %
-00000102 : 05812e23;   % 338:     sw     x24,  92(sp) %
-00000103 : 07912023;   % 339:     sw     x25,  96(sp) %
-00000104 : 07a12223;   % 340:     sw     x26, 100(sp) %
-00000105 : 07b12423;   % 341:     sw     x27, 104(sp) %
-00000106 : 07c12623;   % 342:     sw     x28, 108(sp) %
-00000107 : 07d12823;   % 343:     sw     x29, 112(sp) %
-00000108 : 07e12a23;   % 344:     sw     x30, 116(sp) %
-00000109 : 07f12c23;   % 345:     sw     x31, 120(sp) %
-0000010a : 06012e27;   % 346:     fsw    f0,  124(sp) %
-0000010b : 08112027;   % 347:     fsw    f1,  128(sp) %
-0000010c : 08212227;   % 348:     fsw    f2,  132(sp) %
-0000010d : 08312427;   % 349:     fsw    f3,  136(sp) %
-0000010e : 08412627;   % 350:     fsw    f4,  140(sp) %
-0000010f : 08512827;   % 351:     fsw    f5,  144(sp) %
-00000110 : 08612a27;   % 352:     fsw    f6,  148(sp) %
-00000111 : 08712c27;   % 353:     fsw    f7,  152(sp) %
-00000112 : 08812e27;   % 354:     fsw    f8,  156(sp) %
-00000113 : 0a912027;   % 355:     fsw    f9,  160(sp) %
-00000114 : 0aa12227;   % 356:     fsw    f10, 164(sp) %
-00000115 : 0ab12427;   % 357:     fsw    f11, 168(sp) %
-00000116 : 0ac12627;   % 358:     fsw    f12, 172(sp) %
-00000117 : 0ad12827;   % 359:     fsw    f13, 176(sp) %
-00000118 : 0ae12a27;   % 360:     fsw    f14, 180(sp) %
-00000119 : 0af12c27;   % 361:     fsw    f15, 184(sp) %
-0000011a : 0b012e27;   % 362:     fsw    f16, 188(sp) %
-0000011b : 0d112027;   % 363:     fsw    f17, 192(sp) %
-0000011c : 0d212227;   % 364:     fsw    f18, 196(sp) %
-0000011d : 0d312427;   % 365:     fsw    f19, 200(sp) %
-0000011e : 0d412627;   % 366:     fsw    f20, 204(sp) %
-0000011f : 0d512827;   % 367:     fsw    f21, 208(sp) %
-00000120 : 0d612a27;   % 368:     fsw    f22, 212(sp) %
-00000121 : 0d712c27;   % 369:     fsw    f23, 216(sp) %
-00000122 : 0d812e27;   % 370:     fsw    f24, 220(sp) %
-00000123 : 0f912027;   % 371:     fsw    f25, 224(sp) %
-00000124 : 0fa12227;   % 372:     fsw    f26, 228(sp) %
-00000125 : 0fb12427;   % 373:     fsw    f27, 232(sp) %
-00000126 : 0fc12627;   % 374:     fsw    f28, 236(sp) %
-00000127 : 0fd12827;   % 375:     fsw    f29, 240(sp) %
-00000128 : 0fe12a27;   % 376:     fsw    f30, 244(sp) %
-00000129 : 0ff12c27;   % 377:     fsw    f31, 248(sp) %
-0000012a : 000002b3;   % 380:     add     t0, zero, zero %
-0000012b : 00000333;   % 381:     add     t1, zero, zero %
-0000012c : 000003b3;   % 382:     add     t2, zero, zero %
-0000012d : 00000e33;   % 383:     add     t3, zero, zero %
-0000012e : 00000eb3;   % 384:     add     t4, zero, zero %
-0000012f : 00000f33;   % 385:     add     t5, zero, zero %
-00000130 : 00000fb3;   % 386:     add     t6, zero, zero %
-00000131 : 00a00293;   % 391:     addi    t0, zero, 10 %
-00000132 : 13128663;   % 392:     beq     t0, a7, goToExit          # ecall exit %
-00000133 : 06e00293;   % 393:     addi    t0, zero, 110 %
-00000134 : 13128263;   % 394:     beq     t0, a7, goToExit          # ecall exit %
-00000135 : 00100293;   % 396:     addi    t0, zero, 1               # ecall 1 = print int %
-00000136 : 13128a63;   % 397:     beq     t0, a7, goToPrintInt %
-00000137 : 06500293;   % 398:     addi    t0, zero, 101             # ecall 1 = print int %
-00000138 : 13128663;   % 399:     beq     t0, a7, goToPrintInt %
-00000139 : 00200293;   % 401:     addi    t0, zero, 2               # ecall 2 = print float %
-0000013a : 13128e63;   % 402:     beq     t0, a7, goToPrintFloat %
-0000013b : 06600293;   % 403:     addi    t0, zero, 102             # ecall 2 = print float %
-0000013c : 13128a63;   % 404:     beq     t0, a7, goToPrintFloat %
-0000013d : 00400293;   % 406:     addi    t0, zero, 4               # ecall 4 = print string %
-0000013e : 11128e63;   % 407:     beq     t0, a7, goToPrintString %
-0000013f : 06800293;   % 408:     addi    t0, zero, 104             # ecall 4 = print string %
-00000140 : 11128a63;   % 409:     beq     t0, a7, goToPrintString %
-00000141 : 00500293;   % 411:     addi    t0, zero, 5               # ecall 5 = read int %
-00000142 : 13128663;   % 412:     beq     t0, a7, goToReadInt %
-00000143 : 06900293;   % 413:     addi    t0, zero, 105             # ecall 5 = read int %
-00000144 : 13128263;   % 414:     beq     t0, a7, goToReadInt %
-00000145 : 00600293;   % 416:     addi    t0, zero, 6               # ecall 6 = read float %
-00000146 : 13128663;   % 417:     beq     t0, a7, goToReadFloat %
-00000147 : 06a00293;   % 418:     addi    t0, zero, 106             # ecall 6 = read float %
-00000148 : 13128263;   % 419:     beq     t0, a7, goToReadFloat %
-00000149 : 00800293;   % 421:     addi    t0, zero, 8               # ecall 8 = read string %
-0000014a : 11128a63;   % 422:     beq     t0, a7, goToReadString %
-0000014b : 06c00293;   % 423:     addi    t0, zero, 108             # ecall 8 = read string %
-0000014c : 11128663;   % 424:     beq     t0, a7, goToReadString %
-0000014d : 00b00293;   % 426:     addi    t0, zero, 11              # ecall 11 = print char %
-0000014e : 0f128263;   % 427:     beq     t0, a7, goToPrintChar %
-0000014f : 06f00293;   % 428:     addi    t0, zero, 111             # ecall 11 = print char %
-00000150 : 0d128e63;   % 429:     beq     t0, a7, goToPrintChar %
-00000151 : 00c00293;   % 431:     addi    t0, zero, 12              # ecall 12 = read char %
-00000152 : 0f128263;   % 432:     beq     t0, a7, goToReadChar %
-00000153 : 07000293;   % 433:     addi    t0, zero, 112             # ecall 12 = read char %
-00000154 : 0d128e63;   % 434:     beq     t0, a7, goToReadChar %
-00000155 : 01e00293;   % 436:     addi    t0, zero, 30              # ecall 30 = time %
-00000156 : 11128663;   % 437:     beq     t0, a7, goToTime %
-00000157 : 08200293;   % 438:     addi    t0, zero, 130             # ecall 30 = time %
-00000158 : 11128263;   % 439:     beq     t0, a7, goToTime %
-00000159 : 02000293;   % 441:     addi    t0, zero, 32              # ecall 32 = sleep %
-0000015a : 11128263;   % 442:     beq     t0, a7, goToSleep %
-0000015b : 08400293;   % 443:     addi    t0, zero, 132             # ecall 32 = sleep %
-0000015c : 0f128e63;   % 444:     beq     t0, a7, goToSleep %
-0000015d : 02400293;   % 446:     addi    t0, zero, 36	      # ecall 36 = print int unsigned %
-0000015e : 11128263;   % 447:     beq     t0, a7, goToPrintIntUnsigned %
-0000015f : 08800293;   % 448:     addi    t0, zero, 136	      # ecall 36 = print int unsigned %
-00000160 : 0f128e63;   % 449:     beq     t0, a7, goToPrintIntUnsigned %
-00000161 : 02900293;   % 451:     addi    t0, zero, 41              # ecall 41 = random %
-00000162 : 0f128663;   % 452:     beq     t0, a7, goToRandom %
-00000163 : 08d00293;   % 453:     addi    t0, zero, 141             # ecall 41 = random %
-00000164 : 0f128263;   % 454:     beq     t0, a7, goToRandom %
-00000165 : 02200293;   % 456:     addi    t0, zero, 34       		# ecall 34 = print hex %
-00000166 : 0b128a63;   % 457:     beq     t0, a7, goToPrintHex %
-00000167 : 08600293;   % 458:     addi    t0, zero, 134		# ecall 34 = print hex %
-00000168 : 0b128663;   % 459:     beq     t0, a7, goToPrintHex %
-00000169 : 01f00293;   % 461:     addi    t0, zero, 31              # ecall 31 = MIDI out %
-0000016a : 0b128663;   % 462:     beq     t0, a7, goToMidiOut       # Generate tone and return immediately %
-0000016b : 08300293;   % 463:     addi    t0, zero, 131             # ecall 31 = MIDI out %
-0000016c : 0b128263;   % 464:     beq     t0, a7, goToMidiOut %
-0000016d : 02100293;   % 466:     addi    t0, zero, 33              # ecall 33 = MIDI out synchronous %
-0000016e : 0b128263;   % 467:     beq     t0, a7, goToMidiOutSync   # Generate tone and return upon tone completion %
-0000016f : 08500293;   % 468:     addi    t0, zero, 133             # ecall 33 = MIDI out synchronous %
-00000170 : 09128e63;   % 469:     beq     t0, a7, goToMidiOutSync %
-00000171 : 03000293;   % 471:     addi    t0, zero, 48              # ecall 48 = CLS %
-00000172 : 0b128e63;   % 472:     beq     t0, a7, goToCLS %
-00000173 : 09400293;   % 473:     addi    t0, zero, 148              # ecall 48 = CLS %
-00000174 : 0b128a63;   % 474:     beq     t0, a7, goToCLS %
-00000175 : 02f00293;   % 476:     addi    t0, zero, 47              # ecall 47 = DrawLine %
-00000176 : 0b128a63;   % 477:     beq     t0, a7, goToBRES %
-00000177 : 09300293;   % 478:     addi    t0, zero, 147              # ecall 47 = DrawLine %
-00000178 : 0b128663;   % 479:     beq     t0, a7, goToBRES     %
-00000179 : 02e00293;   % 481:     addi    t0, zero, 46              # ecall 47 = DrawLine %
-0000017a : 0b128663;   % 482:     beq     t0, a7, goToFDIV %
-0000017b : 09200293;   % 483:     addi    t0, zero, 146              # ecall 47 = DrawLine %
-0000017c : 0b128263;   % 484:     beq     t0, a7, goToFDIV         %
-0000017d : 10008237;   % 487: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-0000017e : 00020213;   % 487:  %
-0000017f : 00419663;   % 487: <14> bne gp,tp,goToExitDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-00000180 : 00a00893;   % 488: 		li 	a7, 10			# chama o ecall normal do Rars %
-00000181 : 00000073;   % 489: 		ecall				# exit ecall %
-00000182 : 0000006f;   % 491: 	goToExitDE2:	j 	goToExitDE2		# trava o processador : Não tem sistema operacional! %
-00000183 : 198000ef;   % 493: 	goToPrintInt:	jal     printInt               	# chama printInt %
-00000184 : 08c0006f;   % 494: 		j       endEcall %
-00000185 : 284000ef;   % 496: 	goToPrintString: jal     printString           	# chama printString %
-00000186 : 0840006f;   % 497: 		j       endEcall %
-00000187 : 2c4000ef;   % 499: 	goToPrintChar:	jal     printChar		# chama printChar %
-00000188 : 07c0006f;   % 500: 		j       endEcall %
-00000189 : 668000ef;   % 502: 	goToPrintFloat:	jal     printFloat		# chama printFloat %
-0000018a : 0740006f;   % 503: 		j       endEcall %
-0000018b : 3a8000ef;   % 505: 	goToReadChar:	jal     readChar              	# chama readChar %
-0000018c : 06c0006f;   % 506: 		j       endEcall %
-0000018d : 4d0000ef;   % 508: 	goToReadInt:   	jal     readInt                 # chama readInt %
-0000018e : 0640006f;   % 509: 		j       endEcall %
-0000018f : 438000ef;   % 511: 	goToReadString:	jal     readString              # chama readString %
-00000190 : 05c0006f;   % 512: 		j       endEcall %
-00000191 : 055000ef;   % 514: 	goToReadFloat:	jal     readFloat               # chama readFloat %
-00000192 : 0540006f;   % 515: 		j       endEcall %
-00000193 : 1d8000ef;   % 517: 	goToPrintHex:	jal     printHex                # chama printHex %
-00000194 : 04c0006f;   % 518: 		j       endEcall %
-00000195 : 530000ef;   % 520: 	goToMidiOut:	jal     midiOut                 # chama MIDIout %
-00000196 : 0440006f;   % 521: 		j       endEcall %
-00000197 : 5a0000ef;   % 523: 	goToMidiOutSync: jal     midiOutSync   		# chama MIDIoutSync %
-00000198 : 03c0006f;   % 524: 		j       endEcall %
-00000199 : 299000ef;   % 526: 	goToTime:	jal     Time                    # chama time %
-0000019a : 0340006f;   % 527: 		j       endEcall %
-0000019b : 2bd000ef;   % 529: 	goToSleep:	jal     sleep                  	# chama sleep %
-0000019c : 02c0006f;   % 530: 		j       endEcall %
-0000019d : 355000ef;   % 532: 	goToRandom:	jal     random                 	# chama random %
-0000019e : 0240006f;   % 533: 		j       endEcall %
-0000019f : 2e1000ef;   % 535: 	goToPrintIntUnsigned: jal     printIntUnsigned	# chama printIntUnsigned %
-000001a0 : 01c0006f;   % 536: 		j	endEcall %
-000001a1 : 36d000ef;   % 538: 	goToCLS:	jal     clsCLS                 	# chama CLS %
-000001a2 : 0140006f;   % 539: 		j       endEcall %
-000001a3 : 3c1000ef;   % 541: 	goToBRES:	jal     BRESENHAM               # chama BRESENHAM %
-000001a4 : 00c0006f;   % 542: 		j       endEcall    	 %
-000001a5 : 4e5000ef;   % 544:  	goToFDIV:	jal	FDIVISOR 	              # chama Leitura do divisor de frequencias %
-000001a6 : 0040006f;   % 545: 		j       endEcall      		    				    		    				    		    		 %
-000001a7 : 00012083;   % 547: endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha %
-000001a8 : 00412103;   % 548: 		lw	x2,   4(sp)	 %
-000001a9 : 00812183;   % 549: 		lw	x3,   8(sp)	 %
-000001aa : 00c12203;   % 550: 		lw	x4,  12(sp)      	 %
-000001ab : 01012283;   % 551: 		lw	x5,  16(sp)      	 %
-000001ac : 01412303;   % 552: 		lw	x6,  20(sp)	 %
-000001ad : 01812383;   % 553: 		lw	x7,  24(sp) %
-000001ae : 01c12403;   % 554: 		lw	x8,  28(sp) %
-000001af : 02012483;   % 555: 		lw	x9,  32(sp) %
-000001b0 : 02812583;   % 557: 		lw     x11, 40(sp) %
-000001b1 : 02c12603;   % 558: 		lw     x12, 44(sp) %
-000001b2 : 03012683;   % 559: 		lw     x13, 48(sp) %
-000001b3 : 03412703;   % 560: 		lw     x14, 52(sp) %
-000001b4 : 03812783;   % 561: 		lw     x15, 56(sp) %
-000001b5 : 03c12803;   % 562: 		lw     x16, 60(sp) %
-000001b6 : 04012883;   % 563: 		lw     x17, 64(sp) %
-000001b7 : 04412903;   % 564: 		lw     x18, 68(sp) %
-000001b8 : 04812983;   % 565: 		lw     x19, 72(sp) %
-000001b9 : 04c12a03;   % 566: 		lw     x20, 76(sp) %
-000001ba : 05012a83;   % 567: 		lw     x21, 80(sp) %
-000001bb : 05412b03;   % 568: 		lw     x22, 84(sp) %
-000001bc : 05812b83;   % 569: 		lw     x23, 88(sp) %
-000001bd : 05c12c03;   % 570: 		lw     x24, 92(sp) %
-000001be : 06012c83;   % 571: 		lw     x25, 96(sp) %
-000001bf : 06412d03;   % 572: 		lw     x26, 100(sp) %
-000001c0 : 06812d83;   % 573: 		lw     x27, 104(sp) %
-000001c1 : 06c12e03;   % 574: 		lw     x28, 108(sp) %
-000001c2 : 07012e83;   % 575: 		lw     x29, 112(sp) %
-000001c3 : 07412f03;   % 576: 		lw     x30, 116(sp) %
-000001c4 : 07812f83;   % 577: 		lw     x31, 120(sp) %
-000001c5 : 07c12007;   % 578: 		flw    f0,  124(sp) %
-000001c6 : 08012087;   % 579: 		flw    f1,  128(sp) %
-000001c7 : 08412107;   % 580: 		flw    f2,  132(sp) %
-000001c8 : 08812187;   % 581: 		flw    f3,  136(sp) %
-000001c9 : 08c12207;   % 582: 		flw    f4,  140(sp) %
-000001ca : 09012287;   % 583: 		flw    f5,  144(sp) %
-000001cb : 09412307;   % 584: 		flw    f6,  148(sp) %
-000001cc : 09812387;   % 585: 		flw    f7,  152(sp) %
-000001cd : 09c12407;   % 586: 		flw    f8,  156(sp) %
-000001ce : 0a012487;   % 587: 		flw    f9,  160(sp) %
-000001cf : 0a812587;   % 589: 		flw    f11, 168(sp) %
-000001d0 : 0ac12607;   % 590: 		flw    f12, 172(sp) %
-000001d1 : 0b012687;   % 591: 		flw    f13, 176(sp) %
-000001d2 : 0b412707;   % 592: 		flw    f14, 180(sp) %
-000001d3 : 0b812787;   % 593: 		flw    f15, 184(sp) %
-000001d4 : 0bc12807;   % 594: 		flw    f16, 188(sp) %
-000001d5 : 0c012887;   % 595: 		flw    f17, 192(sp) %
-000001d6 : 0c412907;   % 596: 		flw    f18, 196(sp) %
-000001d7 : 0c812987;   % 597: 		flw    f19, 200(sp) %
-000001d8 : 0cc12a07;   % 598: 		flw    f20, 204(sp) %
-000001d9 : 0d012a87;   % 599: 		flw    f21, 208(sp) %
-000001da : 0d412b07;   % 600: 		flw    f22, 212(sp) %
-000001db : 0d812b87;   % 601: 		flw    f23, 216(sp) %
-000001dc : 0dc12c07;   % 602: 		flw    f24, 220(sp) %
-000001dd : 0e012c87;   % 603: 		flw    f25, 224(sp) %
-000001de : 0e412d07;   % 604: 		flw    f26, 228(sp) %
-000001df : 0e812d87;   % 605: 		flw    f27, 232(sp) %
-000001e0 : 0ec12e07;   % 606: 		flw    f28, 236(sp) %
-000001e1 : 0f012e87;   % 607: 		flw    f29, 240(sp) %
-000001e2 : 0f412f07;   % 608: 		flw    f30, 244(sp) %
-000001e3 : 0f812f87;   % 609: 		flw    f31, 248(sp) %
-000001e4 : 10810113;   % 611: 		addi    sp, sp, 264 %
-000001e5 : 04101273;   % 613: 		csrrw 	tp, 65, zero	# le o valor de EPC salvo no registrador uepc (reg 65) %
-000001e6 : 00420213;   % 614: 		addi 	tp, tp, 4	# soma 4 para obter a instrucao seguinte ao ecall %
-000001e7 : 04121073;   % 615: 		csrrw 	zero, 65, tp	# coloca no registrador uepc %
-000001e8 : 00200073;   % 616: 		uret			# retorna PC=uepc %
-000001e9 : ffc10113;   % 629: printInt:	addi 	sp, sp, -4			# Aloca espaco %
-000001ea : 00112023;   % 630: 		sw 	ra, 0(sp)			# salva ra %
-000001eb : 0fc15297;   % 631: 		la 	t0, TempBuffer			# carrega o Endereco do Buffer da String %
-000001ec : 99428293;   % 631:  %
-000001ed : 00055a63;   % 633: 		bge 	a0, zero, ehposprintInt		# Se eh positvo %
-000001ee : 02d00313;   % 634: 		li 	t1, '-'				# carrega o sinal - %
-000001ef : 00628023;   % 635: 		sb 	t1, 0(t0)			# coloca no buffer %
-000001f0 : 00128293;   % 636: 		addi 	t0, t0, 1			# incrementa endereco do buffer %
-000001f1 : 40a00533;   % 637: 		sub 	a0, zero, a0			# torna o numero positivo %
-000001f2 : 00a00393;   % 639: ehposprintInt:  li 	t2, 10				# carrega numero 10 %
-000001f3 : 00000313;   % 640: 		li 	t1, 0				# carrega numero de digitos com 0 %
-000001f4 : 02754eb3;   % 642: loop1printInt:	div 	t4, a0, t2			# divide por 10 (quociente) %
-000001f5 : 02756e33;   % 643: 		rem 	t3, a0, t2			# resto %
-000001f6 : ffc10113;   % 644: 		addi 	sp, sp, -4			# aloca espaco na pilha %
-000001f7 : 01c12023;   % 645: 		sw 	t3, 0(sp)			# coloca resto na pilha %
-000001f8 : 01d00533;   % 646: 		mv 	a0, t4				# atualiza o numero com o quociente %
-000001f9 : 00130313;   % 647: 		addi 	t1, t1, 1			# incrementa o contador de digitos %
-000001fa : fe0514e3;   % 648: 		bne 	a0, zero, loop1printInt		# verifica se o numero eh zero %
-000001fb : 00012383;   % 650: loop2printInt:	lw 	t2, 0(sp)			# le digito da pilha %
-000001fc : 00410113;   % 651: 		addi 	sp, sp, 4			# libera espaco %
-000001fd : 03038393;   % 652: 		addi 	t2, t2, 48			# converte o digito para ascii %
-000001fe : 00728023;   % 653: 		sb 	t2, 0(t0)			# coloca caractere no buffer %
-000001ff : 00128293;   % 654: 		addi 	t0, t0, 1			# incrementa endereco do buffer %
-00000200 : fff30313;   % 655: 		addi 	t1, t1, -1			# decrementa contador de digitos %
-00000201 : fe0314e3;   % 656: 		bne 	t1, zero, loop2printInt		# eh o ultimo? %
-00000202 : 00028023;   % 657: 		sb 	zero, 0(t0)			# insere \NULL na string %
-00000203 : 0fc15517;   % 659: 		la 	a0, TempBuffer			# Endereco do buffer da srting %
-00000204 : 93450513;   % 659:  %
-00000205 : 084000ef;   % 660: 		jal 	printString			# chama o print string %
-00000206 : 00012083;   % 662: 		lw 	ra, 0(sp)			# recupera a %
-00000207 : 00410113;   % 663: 		addi 	sp, sp, 4			# libera espaco %
-00000208 : 00008067;   % 664: fimprintInt:	ret					# retorna %
-00000209 : ffc10113;   % 676: printHex:	addi    sp, sp, -4    		# aloca espaco %
-0000020a : 00112023;   % 677:     		sw      ra, 0(sp)		# salva ra %
-0000020b : 00a002b3;   % 678: 		mv 	t0, a0			# Inteiro de 32 bits a ser impresso em Hexa %
-0000020c : 0fc15317;   % 679: 		la 	t1, TabelaHexASCII	# endereco da tabela HEX->ASCII %
-0000020d : b1030313;   % 679:  %
-0000020e : 0fc15397;   % 680: 		la 	t2, TempBuffer		# onde a string sera montada %
-0000020f : 90838393;   % 680:  %
-00000210 : 03000e13;   % 682: 		li 	t3,'0'			# Caractere '0' %
-00000211 : 01c38023;   % 683: 		sb 	t3,0(t2)		# Escreve '0' no Buffer da String %
-00000212 : 07800e13;   % 684: 		li 	t3,'x'			# Caractere 'x' %
-00000213 : 01c380a3;   % 685: 		sb 	t3,1(t2)		# Escreve 'x' no Buffer da String %
-00000214 : 00238393;   % 686: 		addi 	t2,t2,2			# novo endereco inicial da string %
-00000215 : 01c00e13;   % 688: 		li 	t3, 28			# contador de nibble   inicio = 28 %
-00000216 : 020e4263;   % 689: loopprintHex:	blt 	t3, zero, fimloopprintHex	# terminou? t3<0? %
-00000217 : 01c2deb3;   % 690: 		srl 	t4, t0, t3		# desloca o nibble para direita %
-00000218 : 00fefe93;   % 691: 		andi 	t4, t4, 0x000F		# mascara o nibble	 %
-00000219 : 01d30eb3;   % 692: 		add 	t4, t1, t4		# endereco do ascii do nibble %
-0000021a : 000e8e83;   % 693: 		lb 	t4, 0(t4)		# le ascii do nibble %
-0000021b : 01d38023;   % 694: 		sb 	t4, 0(t2)		# armazena o ascii do nibble no buffer da string %
-0000021c : 00138393;   % 695: 		addi 	t2, t2, 1		# incrementa o endereco do buffer %
-0000021d : ffce0e13;   % 696: 		addi 	t3, t3, -4		# decrementa o numero do nibble %
-0000021e : fe1ff06f;   % 697: 		j 	loopprintHex %
-0000021f : 00038023;   % 699: fimloopprintHex: sb 	zero,0(t2)		# grava \null na string %
-00000220 : 0fc15517;   % 700: 		la 	a0, TempBuffer		# Argumento do print String %
-00000221 : 8c050513;   % 700:  %
-00000222 : 010000ef;   % 701:     		jal	printString		# Chama o print string %
-00000223 : 00012083;   % 703: 		lw 	ra, 0(sp)		# recupera ra %
-00000224 : 00410113;   % 704: 		addi 	sp, sp, 4		# libera espaco %
-00000225 : 00008067;   % 705: fimprintHex:	ret				# retorna %
-00000226 : ff810113;   % 716: printString:	addi	sp, sp, -8			# aloca espaco %
-00000227 : 00112023;   % 717:     		sw	ra, 0(sp)			# salva ra %
-00000228 : 00812223;   % 718:     		sw	s0, 4(sp)			# salva s0 %
-00000229 : 00a00433;   % 719:     		mv	s0, a0              		# s0 = endereco do caractere na string %
-0000022a : 00040503;   % 721: loopprintString:lb	a0, 0(s0)                 	# le em a0 o caracter a ser impresso %
-0000022b : 02050263;   % 723:     		beq     a0, zero, fimloopprintString	# string ASCIIZ termina com NULL %
-0000022c : 030000ef;   % 725:     		jal     printChar       		# imprime char %
-0000022d : 00858593;   % 727: 		addi    a1, a1, 8                 	# incrementa a coluna %
-0000022e : 13900f93;   % 728: 		li 	t6, 313		 %
-0000022f : 01f5c663;   % 729: 		blt	a1, t6, NaoPulaLinha	    	# se ainda tiver lugar na linha %
-00000230 : 00860613;   % 730:     		addi    a2, a2, 8                 	# incrementa a linha %
-00000231 : 000005b3;   % 731:     		mv    	a1, zero			# volta a coluna zero %
-00000232 : 00140413;   % 733: NaoPulaLinha:	addi    s0, s0, 1			# proximo caractere %
-00000233 : fddff06f;   % 734:     		j       loopprintString       		# volta ao loop %
-00000234 : 00012083;   % 736: fimloopprintString:	lw      ra, 0(sp)    		# recupera ra %
-00000235 : 00012403;   % 737: 			lw 	s0, 0(sp)		# recupera s0 original %
-00000236 : 00810113;   % 738:     			addi    sp, sp, 8		# libera espaco %
-00000237 : 00008067;   % 739: fimprintString:	ret      	    			# retorna %
-00000238 : 0ff00e93;   % 761: printChar:	li 	t4, 0xFF	# t4 temporario %
-00000239 : 008e9e93;   % 762: 		slli 	t4, t4, 8	# t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00") %
-0000023a : 01d6ff33;   % 763: 		and    	t5, a3, t4   	# t5 obtem cor de fundo %
-0000023b : 008f5f13;   % 764:     		srli	t5, t5, 8	# numero da cor de fundo %
-0000023c : 0ff6ff93;   % 765: 		andi   	t6, a3, 0xFF    # t6 obtem cor de frente %
-0000023d : 02000213;   % 767: 		li 	tp, ' ' %
-0000023e : 00454863;   % 768: 		blt 	a0, tp, NAOIMPRIMIVEL	# ascii menor que 32 nao eh imprimivel %
-0000023f : 07e00213;   % 769: 		li 	tp, '~' %
-00000240 : 00a24463;   % 770: 		bgt	a0, tp, NAOIMPRIMIVEL	# ascii Maior que 126  nao eh imprimivel %
-00000241 : 0080006f;   % 771:     		j       IMPRIMIVEL %
-00000242 : 02000513;   % 773: NAOIMPRIMIVEL:	li      a0, 32		# Imprime espaco %
-00000243 : 14000213;   % 775: IMPRIMIVEL:	li	tp, 320		# Num colunas 320 %
-00000244 : 02c20eb3;   % 776: 		mul     t4, tp, a2			# multiplica a2x320  t4 = coordenada y %
-00000245 : 00be8eb3;   % 777: 		add     t4, t4, a1               	# t4 = 320*y + x %
-00000246 : 007e8e93;   % 778: 		addi    t4, t4, 7                 	# t4 = 320*y + (x+7) %
-00000247 : ff000237;   % 779: 		li      tp, 0xFF000000          	# Endereco de inicio da memoria VGA0 %
-00000248 : 00020213;   % 779:  %
-00000249 : 00070663;   % 780: 		beq 	a4, zero, PULAFRAME		# Verifica qual o frame a ser usado em a4 %
-0000024a : ff100237;   % 781: 		li      tp, 0xFF100000          	# Endereco de inicio da memoria VGA1 %
-0000024b : 00020213;   % 781:  %
-0000024c : 004e8eb3;   % 782: PULAFRAME:	add     t4, t4, tp               	# t4 = endereco de impressao do ultimo pixel da primeira linha do char %
-0000024d : fe050393;   % 783: 		addi    t2, a0, -32               	# indice do char na memoria %
-0000024e : 00339393;   % 784: 		slli    t2, t2, 3                 	# offset em bytes em relacao ao endereco inicial %
-0000024f : 0fc14e17;   % 785: 		la      t3, LabelTabChar		# endereco dos caracteres na memoria %
-00000250 : 3e0e0e13;   % 785:  %
-00000251 : 01c383b3;   % 786: 		add     t2, t2, t3               	# endereco do caractere na memoria %
-00000252 : 0003ae03;   % 787: 		lw      t3, 0(t2)                 	# carrega a primeira word do char %
-00000253 : 00400293;   % 788: 		li 	t0, 4				# i=4 %
-00000254 : 02028e63;   % 790: forChar1I:	beq     t0, zero, endForChar1I		# if(i == 0) end for i %
-00000255 : 00800313;   % 791:     		addi    t1, zero, 8               	# j = 8 %
-00000256 : 02030463;   % 793: 	forChar1J:      beq     t1, zero, endForChar1J    	# if(j == 0) end for j %
-00000257 : 001e7c93;   % 794:         		andi    s9, t3, 0x001			# primeiro bit do caracter %
-00000258 : 001e5e13;   % 795:         		srli    t3, t3, 1             		# retira o primeiro bit %
-00000259 : 000c8663;   % 796:         		beq     s9, zero, printCharPixelbg1	# pixel eh fundo? %
-0000025a : 01fe8023;   % 797:         		sb      t6, 0(t4)             		# imprime pixel com cor de frente %
-0000025b : 0080006f;   % 798:         		j       endCharPixel1 %
-0000025c : 01ee8023;   % 799: printCharPixelbg1:     	sb      t5, 0(t4)                 	# imprime pixel com cor de fundo %
-0000025d : fff30313;   % 800: endCharPixel1:     	addi    t1, t1, -1                	# j-- %
-0000025e : fffe8e93;   % 801:     			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda %
-0000025f : fddff06f;   % 802:     			j       forChar1J			# vollta novo pixel %
-00000260 : fff28293;   % 804: endForChar1J: 	addi    t0, t0, -1 		# i-- %
-00000261 : 148e8e93;   % 805:     		addi    t4, t4, 328           	# 2**12 + 8 %
-00000262 : fc9ff06f;   % 806:     		j       forChar1I		# volta ao loop %
-00000263 : 0043ae03;   % 808: endForChar1I:	lw      t3, 4(t2)           	# carrega a segunda word do char %
-00000264 : 00400293;   % 809: 		li 	t0, 4			# i = 4 %
-00000265 : 02028e63;   % 810: forChar2I:     	beq     t0, zero, endForChar2I  # if(i == 0) end for i %
-00000266 : 00800313;   % 811:     		addi    t1, zero, 8             # j = 8 %
-00000267 : 02030463;   % 813: 	forChar2J:	beq	t1, zero, endForChar2J    	# if(j == 0) end for j %
-00000268 : 001e7c93;   % 814:         		andi    s9, t3, 0x001	    		# pixel a ser impresso %
-00000269 : 001e5e13;   % 815:         		srli    t3, t3, 1                 	# desloca para o proximo %
-0000026a : 000c8663;   % 816:         		beq     s9, zero, printCharPixelbg2	# pixel eh fundo? %
-0000026b : 01fe8023;   % 817:         		sb      t6, 0(t4)			# imprime cor frente %
-0000026c : 0080006f;   % 818:         		j       endCharPixel2			# volta ao loop %
-0000026d : 01ee8023;   % 820: printCharPixelbg2:     	sb      t5, 0(t4)			# imprime cor de fundo %
-0000026e : fff30313;   % 822: endCharPixel2:     	addi    t1, t1, -1			# j-- %
-0000026f : fffe8e93;   % 823:     			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda %
-00000270 : fddff06f;   % 824:     			j       forChar2J %
-00000271 : fff28293;   % 826: endForChar2J:	addi	t0, t0, -1 		# i-- %
-00000272 : 148e8e93;   % 827:     		addi    t4, t4, 328		# %
-00000273 : fc9ff06f;   % 828:     		j       forChar2I		# volta ao loop %
-00000274 : 00008067;   % 830: endForChar2I:	ret				# retorna %
-00000275 : 00000013;   % 839: readChar: 		nop %
-00000276 : ff2002b7;   % 843: readCharKDMMIO:		li 	t0, 0xFF200000			# Execucao com Polling do KD MMIO %
-00000277 : 00028293;   % 843:  %
-00000278 : 0002a503;   % 845: loopReadCharKDMMIO:  	lw     	a0, 0(t0)   			# le o bit de flag do teclado %
-00000279 : 00157513;   % 846: 			andi 	a0, a0, 0x0001			# mascara bit 0 %
-0000027a : fe050ce3;   % 847: 			beq     a0, zero, loopReadCharKDMMIO  	# testa se uma tecla foi pressionada %
-0000027b : 0042a503;   % 848:    			lw 	a0, 4(t0)			# le o ascii da tecla pressionada %
-0000027c : 0800006f;   % 849: 			j fimreadChar				# fim Read Char %
-0000027d : ff2002b7;   % 866: readCharDE2:  	li      t0, 0xFF200100 			# Endereco buffer0 %
-0000027e : 10028293;   % 866:  %
-0000027f : 0002a303;   % 867:     		lw     	t1, 0(t0)				# conteudo inicial do buffer %
-00000280 : 0002a383;   % 869: loopReadChar:  	lw     	t2, 0(t0)   				# le buffer teclado %
-00000281 : 00639663;   % 870: 		bne     t2, t1, buffermodificadoChar    	# testa se o buffer foi modificado %
-00000282 : 00700333;   % 872: atualizaBufferChar:  mv t1, t2			# atualiza o buffer com o novo valor %
-00000283 : ff5ff06f;   % 873:     		j       loopReadChar		# loop de principal de leitura  %
-00000284 : 0ff00f13;   % 875: buffermodificadoChar:	li t5, 0xFF %
-00000285 : 008f1f13;   % 876: 	slli 	t5, t5, 8			# t5 = 0x0000FF00 %
-00000286 : 01e3fe33;   % 877: 	and    	t3, t2, t5 			# mascara o 2o scancode %
-00000287 : 0000f237;   % 878: 	li 	tp, 0x0000F000 %
-00000288 : 00020213;   % 878:  %
-00000289 : 024e0063;   % 879: 	beq     t3, tp, teclasoltaChar		# eh 0xF0 no 2o scancode? tecla foi solta %
-0000028a : 0ff00213;   % 880: 	li	tp, 0x000000FF %
-0000028b : 0043fe33;   % 881: 	and	t3, t2, tp			# mascara 1o scancode	(essa podemos fazer diretamente) %
-0000028c : 01200213;   % 882: 	li	tp, 0x00000012 %
-0000028d : fc4e1ae3;   % 883:     	bne 	t3, tp, atualizaBufferChar	# nao eh o SHIFT que esta pressionado ? volta a ler  %
-0000028e : 0fc14417;   % 884: 	la      s0, LabelScanCodeShift		# se for SHIFT que esta pressionado atualiza o endereco da tabel %
-0000028f : 68240413;   % 884:  %
-00000290 : fc9ff06f;   % 885:     	j       atualizaBufferChar		# volta a ler %
-00000291 : 0ff3fe13;   % 887: teclasoltaChar:		andi t3, t2, 0x00FF		# mascara o 1o scancode %
-00000292 : 08000213;   % 888: 	li	tp, 0x00000080 %
-00000293 : fbc24ee3;   % 889:   	bgt	t3, tp, atualizaBufferChar		# se o scancode for > 0x80 entao nao eh imprimivel! %
-00000294 : 01200213;   % 890:   	li	tp, 0x00000012 %
-00000295 : 004e1863;   % 891: 	bne 	t3, tp, naoehshiftChar			# nao foi o shift que foi solto? entao processa %
-00000296 : 0fc14417;   % 892: 	la 	s0, LabelScanCode			# shift foi solto atualiza o endereco da tabela %
-00000297 : 5dc40413;   % 892:  %
-00000298 : fa9ff06f;   % 893: 	j 	atualizaBufferChar			# volta a ler %
-00000299 : 01c40e33;   % 895: naoehshiftChar:	   	add     t3, s0, t3              # endereco na tabela de scancode da tecla com ou sem shift %
-0000029a : 000e0503;   % 896:     	lb      a0, 0(t3)				# le o ascii do caracter para a0 %
-0000029b : f8050ee3;   % 897:     	beq     a0, zero, atualizaBufferChar		# se for caractere nao imprimivel volta a ler %
-0000029c : 00008067;   % 899: fimreadChar: 	ret			# retorna %
-0000029d : ff810113;   % 911: readString: 	addi 	sp, sp, -8			# reserva espaco na pilha %
-0000029e : 00812223;   % 912: 		sw 	s0, 4(sp)			# salva s0 %
-0000029f : 00112023;   % 913: 		sw 	ra, 0(sp)			# salva ra %
-000002a0 : 00000693;   % 914: 		li 	a3, 0				# zera o contador de caracteres digitados %
-000002a1 : 00a00933;   % 915: 		mv 	s2, a0				# salva o endereco inicial %
-000002a2 : 0fc14417;   % 916:     		la      s0, LabelScanCode      		# Endereco da tabela de scancode inicial para readChar %
-000002a3 : 5ac40413;   % 916:  %
-000002a4 : 04d58c63;   % 918: loopreadString: beq 	a1, a3, fimreadString   	# buffer cheio fim %
-000002a5 : ff810113;   % 920: 		addi 	sp, sp, -8 %
-000002a6 : 00112023;   % 921: 		sw 	ra, 0(sp)			# salva ra %
-000002a7 : 00a12223;   % 922: 		sw 	a0, 4(sp)			# salva a0 pois ele sera reescrito em readChar %
-000002a8 : f35ff0ef;   % 923: 		jal 	readChar			# le um caracter do teclado (retorno em a0) %
-000002a9 : 00a00fb3;   % 924: 		mv 	t6, a0				# t6 eh a letra lida em readChar %
-000002aa : 00012083;   % 925: 		lw 	ra, 0(sp) %
-000002ab : 00412503;   % 926: 		lw 	a0, 4(sp) %
-000002ac : 00810113;   % 927: 		addi 	sp, sp, 8 %
-000002ad : 00800213;   % 929: 		li 	tp, 0x08			 %
-000002ae : 004f9c63;   % 930: 		bne	t6, tp, PulaBackSpace		# Se nao for BACKSPACE %
-000002af : fcd00ae3;   % 931: 		beq	zero, a3, loopreadString	# Se não tem nenhum caractere no buffer apenas volta a ler %
-000002b0 : fff68693;   % 932: 		addi	a3, a3, -1			# diminui contador %
-000002b1 : fff50513;   % 933: 		addi 	a0, a0, -1			# diminui endereco do buffer %
-000002b2 : 00050023;   % 934: 		sb 	zero, 0(a0)			# coloca zero no caractere anterior %
-000002b3 : fc5ff06f;   % 935: 		j loopreadString %
-000002b4 : 00a00213;   % 937: PulaBackSpace:	li	tp, 0x0A %
-000002b5 : 004f8a63;   % 938: 		beq 	t6, tp, fimreadString		# se for tecla ENTER fim %
-000002b6 : 01f50023;   % 939: 		sb 	t6, 0(a0)			# grava no buffer %
-000002b7 : 00168693;   % 940: 		addi 	a3, a3, 1			# incrementa contador %
-000002b8 : 00150513;   % 941: 		addi 	a0, a0, 1			# incrementa endereco no buffer %
-000002b9 : fadff06f;   % 942: 		j loopreadString			# volta a ler outro caractere %
-000002ba : 00050023;   % 944: fimreadString: 	sb 	zero, 0(a0)			# grava NULL no buffer %
-000002bb : fff50613;   % 945: 		addi 	a2, a0, -1			# Para que a2 tenha o endereco do ultimo caractere digitado %
-000002bc : 01200533;   % 946: 		mv	a0, s2				# a0 volta a ter o endereco inicial da string %
-000002bd : 00012083;   % 947: 		lw 	ra, 0(sp)			# recupera ra %
-000002be : 00412403;   % 948: 		lw	s0, 4(sp)			# recupera s0 %
-000002bf : 00810113;   % 949: 		addi 	sp, sp, 8			# libera espaco %
-000002c0 : 00008067;   % 950: 		ret					# retorna %
-000002c1 : ffc10113;   % 959: readInt: 	addi 	sp,sp,-4		# reserva espaco na pilha %
-000002c2 : 00112023;   % 960: 	sw 	ra, 0(sp)			# salva ra %
-000002c3 : 0fc14517;   % 961: 	la 	a0, TempBuffer			# Endereco do buffer de string %
-000002c4 : 63450513;   % 961:  %
-000002c5 : 00a00593;   % 962: 	li 	a1, 10				# numero maximo de digitos %
-000002c6 : f5dff0ef;   % 963: 	jal 	readString			# le uma string de ate 10 digitos, a3 numero de digitos %
-000002c7 : 00c002b3;   % 964: 	mv 	t0, a2				# copia endereco do ultimo digito %
-000002c8 : 00a00393;   % 965: 	li 	t2, 10				# dez %
-000002c9 : 00100e13;   % 966: 	li 	t3, 1				# dezenas, centenas, etc %
-000002ca : 00000533;   % 967: 	mv 	a0, zero			# zera o numero %
-000002cb : 04068663;   % 969: loopReadInt: 	beq	a3,zero, fimReadInt	# Leu todos os digitos %
-000002cc : 00028303;   % 970: 	lb 	t1, (t0)			# le um digito %
-000002cd : 02d00213;   % 971: 	li	tp, 0x0000002D %
-000002ce : 02430e63;   % 972: 	beq 	t1, tp, ehnegReadInt		# = '-' %
-000002cf : 02b00213;   % 973: 	li	tp, 0x0000002B %
-000002d0 : 02430c63;   % 974: 	beq 	t1, tp, ehposReadInt		# = '+' %
-000002d1 : 03000213;   % 975: 	li	tp, 0x00000030 %
-000002d2 : 02434463;   % 976: 	blt 	t1, tp, naoehReadInt		# <'0' %
-000002d3 : 03900213;   % 977: 	li	tp, 0x00000039 %
-000002d4 : 02624063;   % 978: 	bgt 	t1, tp, naoehReadInt		# >'9' %
-000002d5 : fd030313;   % 979: 	addi 	t1, t1, -48			# transforma ascii em numero %
-000002d6 : 03c30333;   % 980: 	mul 	t1, t1, t3			# multiplica por dezenas/centenas %
-000002d7 : 00650533;   % 981: 	add 	a0, a0, t1			# soma no numero %
-000002d8 : 027e0e33;   % 982: 	mul 	t3, t3, t2			# proxima dezena/centena %
-000002d9 : fff28293;   % 983: 	addi 	t0, t0, -1			# busca o digito anterior %
-000002da : fff68693;   % 984: 	addi	a3, a3, -1			# reduz o contador de digitos  %
-000002db : fc1ff06f;   % 985: 	j 	loopReadInt			# volta para buscar proximo digito %
-000002dc : 0080006f;   % 988: 		j fimReadInt			# como nao esta implmentado apenas retorna %
-000002dd : 40a00533;   % 990: ehnegReadInt:	sub a0,zero,a0			# se for negativo %
-000002de : 00012083;   % 994: fimReadInt:	lw 	ra, 0(sp)		# recupera ra %
-000002df : 00410113;   % 995: 		addi 	sp, sp, 4		# libera espaco %
-000002e0 : 00008067;   % 996: 		ret				# fim ReadInt %
-000002e1 : 10008237;   % 1016: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-000002e2 : 00020213;   % 1016:  %
-000002e3 : 00419863;   % 1016: <14> bne gp,tp,midiOutDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-000002e4 : 01f00893;   % 1018: 	li a7,31		# Chama o ecall normal %
-000002e5 : 00000073;   % 1019: 	ecall %
-000002e6 : 0600006f;   % 1020: 	j fimmidiOut %
-000002e7 : ff2002b7;   % 1022: midiOutDE2:	li      t0, 0xFF200178 %
-000002e8 : 17828293;   % 1022:  %
-000002e9 : 00000333;   % 1023:     		add     t1, zero, zero %
-000002ea : 00f67393;   % 1028:    	 	andi    t2, a2, 0x0000000F %
-000002eb : 01b39393;   % 1029:     		slli    t2, t2, 27 %
-000002ec : 00736333;   % 1030:     		or      t1, t1, t2 %
-000002ed : 07f6f393;   % 1033:     		andi    t2, a3, 0x0000007F %
-000002ee : 01439393;   % 1034:     		slli    t2, t2, 20 %
-000002ef : 00736333;   % 1035:     		or      t1, t1, t2 %
-000002f0 : 07f57393;   % 1038:     		andi    t2, a0, 0x0000007F %
-000002f1 : 00d39393;   % 1039:     		slli    t2, t2, 13 %
-000002f2 : 00736333;   % 1040:     		or      t1, t1, t2 %
-000002f3 : 1ff00e93;   % 1043: 		li 	t4, 0x1FF %
-000002f4 : 004e9e93;   % 1044: 		slli 	t4, t4, 4 %
-000002f5 : 00fe8e93;   % 1045: 		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF %
-000002f6 : 01d5f3b3;   % 1046:     		and    	t2, a1, t4 %
-000002f7 : 00736333;   % 1047:     		or      t1, t1, t2 %
-000002f8 : 0040006f;   % 1050:     		j       SintMidOut %
-000002f9 : 0062a023;   % 1052: SintMidOut:	sw	t1, 0(t0) %
-000002fa : ff2003b7;   % 1055: 	    		li      t2, 0xFF20017C %
-000002fb : 17c38393;   % 1055:  %
-000002fc : 0003ae03;   % 1056: Check_AUD_DACLRCK:     	lw      t3, 0(t2) %
-000002fd : fe0e0ee3;   % 1057:     			beq     t3, zero, Check_AUD_DACLRCK %
-000002fe : 00008067;   % 1059: fimmidiOut:    		ret %
-000002ff : 10008237;   % 1077: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-00000300 : 00020213;   % 1077:  %
-00000301 : 00419863;   % 1077: <14> bne gp,tp,midiOutSyncDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-00000302 : 02100893;   % 1079: 	li a7,33		# Chama o ecall normal %
-00000303 : 00000073;   % 1080: 	ecall %
-00000304 : 0780006f;   % 1081: 	j fimmidiOutSync %
-00000305 : ff2002b7;   % 1083: midiOutSyncDE2:	li      t0, 0xFF200178 %
-00000306 : 17828293;   % 1083:  %
-00000307 : 00000333;   % 1084:     		add     t1, zero, zero %
-00000308 : 08000337;   % 1087:     		lui    	t1, 0x08000 %
-00000309 : 00431313;   % 1088: 		slli	t1,t1,4 %
-0000030a : 00f67393;   % 1091:     		andi    t2, a2, 0x00F %
-0000030b : 01b39393;   % 1092:     		slli    t2, t2, 27 %
-0000030c : 00736333;   % 1093:     		or      t1, t1, t2 %
-0000030d : 07f6f393;   % 1096:     		andi    t2, a3, 0x07F %
-0000030e : 01439393;   % 1097:     		slli    t2, t2, 20 %
-0000030f : 00736333;   % 1098:     		or      t1, t1, t2 %
-00000310 : 07f57393;   % 1101:     		andi    t2, a0, 0x07F %
-00000311 : 00d39393;   % 1102:     		slli    t2, t2, 13 %
-00000312 : 00736333;   % 1103:     		or      t1, t1, t2 %
-00000313 : 1ff00e93;   % 1106: 		li 	t4, 0x1FF %
-00000314 : 004e9e93;   % 1107: 		slli 	t4, t4, 4 %
-00000315 : 00fe8e93;   % 1108: 		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF %
-00000316 : 01d5f3b3;   % 1109:     		and    	t2, a1, t4 %
-00000317 : 00736333;   % 1110:     		or      t1, t1, t2 %
-00000318 : 0040006f;   % 1113:     		j       SintMidOutSync %
-00000319 : 0062a023;   % 1115: SintMidOutSync:	sw	t1, 0(t0) %
-0000031a : ff2003b7;   % 1118:     		li      t2, 0xFF20017C %
-0000031b : 17c38393;   % 1118:  %
-0000031c : ff200eb7;   % 1119:     		li      t4, 0xFF200180 %
-0000031d : 180e8e93;   % 1119:  %
-0000031e : 0003ae03;   % 1121: Check_AUD_DACLRCKSync:	lw      t3, 0(t2) %
-0000031f : fe0e0ee3;   % 1122:     			beq     t3, zero, Check_AUD_DACLRCKSync %
-00000320 : 000eaf03;   % 1124: Melody:     	lw      t5, 0(t4) %
-00000321 : fe0f1ee3;   % 1125:     		bne     t5, zero, Melody %
-00000322 : 00008067;   % 1127: fimmidiOutSync:	ret %
-00000323 : ffc10113;   % 1137: printFloat:	addi 	sp, sp, -4 %
-00000324 : 00112023;   % 1138: 		sw 	ra, 0(sp)				# salva ra %
-00000325 : 0fc14417;   % 1139: 		la 	s0, TempBuffer %
-00000326 : 4ac40413;   % 1139:  %
-00000327 : 02b00293;   % 1142: 		li 	t0, '+'			# define sinal '+' %
-00000328 : e00504d3;   % 1143: 		fmv.x.s s1, fa0			# recupera o numero float sem conversao %
-00000329 : 080003b7;   % 1144: 		lui	t2, 0x08000 %
-0000032a : 00439393;   % 1145: 		slli	t2,t2,4 %
-0000032b : 0074f4b3;   % 1146: 		and 	s1, s1, t2			# mascara com 1000...0 %
-0000032c : 00048663;   % 1147: 		beq 	s1, zero, ehposprintFloat	# eh positivo s1=0 %
-0000032d : 00100493;   % 1148: 		li 	s1, 1				# numero eh negativo s1=1 %
-0000032e : 02d00293;   % 1149: 		li 	t0, '-'				# define sinal '-' %
-0000032f : 00540023;   % 1150: ehposprintFloat: sb 	t0, 0(s0)			# coloca sinal no buffer %
-00000330 : 00140413;   % 1151: 		addi 	s0, s0,1			# incrementa o endereco do buffer %
-00000331 : e00502d3;   % 1154: 		 fmv.x.s t0, fa0			# recupera o numero float sem conversao %
-00000332 : 7f800337;   % 1155: 		 lui	t1, 0x7F800 %
-00000333 : 0062f2b3;   % 1156: 		 and 	t0, t0, t1   			# mascara com 0111 1111 1000 0000 0000 0000... %
-00000334 : 00129293;   % 1157: 		 slli 	t0, t0, 1			# tira o sinal do numero %
-00000335 : 0182d293;   % 1158: 		 srli 	t0, t0, 24			# recupera o expoente %
-00000336 : e0050353;   % 1161: 		fmv.x.s t1, fa0				# recupera o numero float sem conversao %
-00000337 : 7ffff3b7;   % 1162: 		lui 	t2, 0x7FFFF %
-00000338 : 0083d393;   % 1163: 		srli	t2, t2, 8 %
-00000339 : 00f38393;   % 1164: 		addi	t2, t2, 0x00F			# t2 = 0x007FFFFF %
-0000033a : 00737333;   % 1165: 		and 	t1, t1, t2			# mascara com 0000 0000 0111 1111 1111... 		  %
-0000033b : 14028863;   % 1167: 		beq 	t0, zero, ehExp0printFloat	# Expoente = 0 %
-0000033c : 0ff00213;   % 1168: 		li	tp, 0x000000FF			# TP = 255 %
-0000033d : 16428863;   % 1169: 		beq 	t0, tp, ehExp255printFloat	# Expoente = 255 %
-0000033e : 20a52053;   % 1173: 		fabs.s 		ft0, fa0		# ft0 recebe o modulo  de x %
-0000033f : 00100213;   % 1174: 		li		tp, 1 %
-00000340 : d00270d3;   % 1175: 		fcvt.s.w 	ft1, tp			# ft1 recebe o numero 1.0 %
-00000341 : 00a00213;   % 1176: 		li		tp, 10 %
-00000342 : d0027353;   % 1177: 		fcvt.s.w 	ft6, tp			# ft6 recebe o numero 10.0 %
-00000343 : 00200213;   % 1178: 		li		tp, 2 %
-00000344 : d0027e53;   % 1179: 		fcvt.s.w 	ft8, tp %
-00000345 : 19c0f3d3;   % 1180: 		fdiv.s		ft7, ft1, ft8		# ft7 recebe o numero 0.5 %
-00000346 : a0101ed3;   % 1182: 		flt.s 	t4, ft0, ft1		# ft0 < 1.0 ? Se sim, E deve ser negativo %
-00000347 : 000e9663;   % 1183: 		bnez	t4, menor1printFloat	# se a comparacao deu true (1), pula %
-00000348 : 20630153;   % 1184: 		fmv.s 	ft2, ft6		# ft2  fator de multiplicacao = 10 %
-00000349 : 02c0006f;   % 1185: 		j 	cont2printFloat		# vai para expoente positivo %
-0000034a : 1860f153;   % 1186: menor1printFloat: fdiv.s ft2,ft1,ft6		# ft2 fator multiplicativo = 0.1 %
-0000034b : 20000253;   % 1189: cont1printFloat: 	fmv.s 	ft4, ft0			# inicia com o numero x  %
-0000034c : 201081d3;   % 1190: 		 	fmv.s 	ft3, ft1			# contador comeca em 1 %
-0000034d : 18227253;   % 1191: loop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# divide o numero pelo fator multiplicativo %
-0000034e : a0120e53;   % 1192: 		 	fle.s 	t3, ft4, ft1			# o numero eh > que 1? entao fim %
-0000034f : 000e0663;   % 1193: 		 	beq 	t3,zero, fimloop1printFloat %
-00000350 : 0011f1d3;   % 1194: 		 	fadd.s 	ft3, ft3, ft1			# incrementa o contador %
-00000351 : ff1ff06f;   % 1195: 		 	j 	loop1printFloat			# volta ao loop %
-00000352 : 18227253;   % 1196: fimloop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# ajusta o numero %
-00000353 : 0200006f;   % 1197: 		 	j 	intprintFloat			# vai para imprimir a parte inteira %
-00000354 : 20000253;   % 1200: cont2printFloat:	fmv.s 	 ft4, ft0			# inicia com o numero x  %
-00000355 : d00071d3;   % 1201: 		 	fcvt.s.w ft3, zero			# contador comeca em 0 %
-00000356 : a0621e53;   % 1202: loop2printFloat:  	flt.s 	 t3, ft4, ft6			# resultado eh < que 10? entao fim %
-00000357 : 18227253;   % 1203: 			fdiv.s 	 ft4, ft4, ft2			# divide o numero pelo fator multiplicativo %
-00000358 : 000e1663;   % 1204: 			bne 	 t3, zero, intprintFloat %
-00000359 : 0011f1d3;   % 1205: 		 	fadd.s 	 ft3, ft3, ft1			# incrementa o contador %
-0000035a : ff1ff06f;   % 1206: 		 	j 	 loop2printFloat %
-0000035b : 10227253;   % 1212: intprintFloat:		fmul.s 		ft4, ft4, ft2		# ajusta o numero %
-0000035c : 08727253;   % 1213: 			fsub.s		ft4, ft4, ft7		# tira 0.5, dessa forma sempre ao converter estaremos fazendo floor %
-0000035d : c00272d3;   % 1214: 		  	fcvt.w.s	t0, ft4			# coloca floor de ft4 em t0 %
-0000035e : 00727253;   % 1215: 			fadd.s		ft4, ft4, ft7		# readiciona 0.5 %
-0000035f : 03028293;   % 1216: 			addi 		t0, t0, 48		# converte para ascii			 %
-00000360 : 00540023;   % 1217: 			sb 		t0, 0(s0)		# coloca no buffer %
-00000361 : 00140413;   % 1218: 		  	addi 		s0, s0, 1		# incrementta o buffer %
-00000362 : 02e00293;   % 1221: 		  	li 	t0, '.'				# carrega o '.' %
-00000363 : 00540023;   % 1222: 		  	sb 	t0, 0(s0)			# coloca no buffer %
-00000364 : 00140413;   % 1223: 		  	addi 	s0, s0, 1			# incrementa o buffer %
-00000365 : 00800313;   % 1226: 		  	li 		t1, 8				# contador de digitos  -  8 casas decimais %
-00000366 : 04030a63;   % 1227: loopfracprintFloat:  	beq 		t1, zero, fimfracprintFloat	# fim dos digitos? %
-00000367 : 08727253;   % 1228: 			fsub.s		ft4, ft4, ft7			# tira 0.5 %
-00000368 : c0027f53;   % 1229: 			fcvt.w.s 	t5, ft4				# floor de ft4 %
-00000369 : 00727253;   % 1230: 			fadd.s		ft4, ft4, ft7			# readiciona 0.5 %
-0000036a : d00f72d3;   % 1231: 			fcvt.s.w	ft5, t5				# reconverte em float so com a parte inteira %
-0000036b : 085272d3;   % 1232: 		  	fsub.s 		ft5, ft4, ft5			# parte fracionaria %
-0000036c : 1062f2d3;   % 1233: 		  	fmul.s 		ft5, ft5, ft6			# mult x 10 %
-0000036d : 0872f2d3;   % 1234: 			fsub.s		ft5, ft5, ft7			# tira 0.5 %
-0000036e : c002f2d3;   % 1235: 			fcvt.w.s	t0, ft5				# coloca floor de ft5 em 10 %
-0000036f : 03028293;   % 1236: 		  	addi 		t0, t0, 48			# converte para ascii %
-00000370 : 03000213;   % 1238: 			li 		tp, 48 %
-00000371 : 0042c663;   % 1239: 			blt		t0, tp, pulaprtFloat1	# testa se eh menor que '0' %
-00000372 : 03900213;   % 1240: 			li		tp, 57 %
-00000373 : 00525463;   % 1241: 			ble		t0, tp, pulaprtFloat2	# testa se eh menor ou igual que '9' %
-00000374 : 03000293;   % 1242: pulaprtFloat1:		li		t0, 48			# define como '0'		  			  	 %
-00000375 : 00540023;   % 1244: pulaprtFloat2:	  	sb 		t0, 0(s0)			# coloca no buffer %
-00000376 : 00140413;   % 1245: 		  	addi 		s0, s0, 1			# incrementa endereco %
-00000377 : fff30313;   % 1246: 		  	addi 		t1, t1, -1			# decrementa contador %
-00000378 : 0072f2d3;   % 1247: 			fadd.s		ft5, ft5, ft7			# reincrementa 0.5 %
-00000379 : 20528253;   % 1248: 		  	fmv.s 		ft4, ft5			# coloca o numero em ft4 %
-0000037a : fb1ff06f;   % 1249: 		  	j 		loopfracprintFloat		# volta ao loop %
-0000037b : 04500293;   % 1252: fimfracprintFloat: 	li 	t0,'E'			# carrega 'E' %
-0000037c : 00540023;   % 1253: 			sb 	t0, 0(s0)		# coloca no buffer %
-0000037d : 00140413;   % 1254: 			addi 	s0, s0, 1		# incrementa endereco %
-0000037e : 02b00293;   % 1257: 		  	li 	t0, '+'				# carrega '+' %
-0000037f : 000e8463;   % 1258: 		  	beqz 	t4, expposprintFloat		# nao eh negativo? %
-00000380 : 02d00293;   % 1259: 		  	li 	t0, '-'				# carrega '-' %
-00000381 : 00540023;   % 1260: expposprintFloat: 	sb 	t0, 0(s0)			# coloca no buffer %
-00000382 : 00140413;   % 1261: 		  	addi 	s0, s0, 1			#incrementa endereco %
-00000383 : 00a00313;   % 1264: 			li 	t1, 10				# carrega 10	 %
-00000384 : c001f253;   % 1265: 			fcvt.w.s  tp, ft3			# passa ft3 para t0 %
-00000385 : 026242b3;   % 1266: 			div 	t0, tp, t1			# divide por 10 (dezena) %
-00000386 : 026263b3;   % 1267: 			rem	t2, tp, t1			# t0 = quociente, t2 = resto %
-00000387 : 03028293;   % 1268: 			addi 	t0, t0, 48			# converte para ascii %
-00000388 : 00540023;   % 1269: 			sb 	t0, 0(s0)			# coloca no buffer %
-00000389 : 03038393;   % 1270: 			addi 	t2, t2, 48			# converte para ascii %
-0000038a : 007400a3;   % 1271: 			sb 	t2, 1(s0)			# coloca no buffer %
-0000038b : 00040123;   % 1272: 			sb 	zero, 2(s0)			# insere \NULL da string %
-0000038c : 0fc14517;   % 1273: 			la 	a0, TempBuffer			# endereco do Buffer										 %
-0000038d : 31050513;   % 1273:  %
-0000038e : 0500006f;   % 1274: 	  		j 	fimprintFloat			# imprime a string %
-0000038f : 00030e63;   % 1276: ehExp0printFloat: 	beq 	t1, zero, eh0printFloat		# Verifica se eh zero %
-00000390 : 0fc14517;   % 1278: ehDesnormprintFloat: 	la 	a0, NumDesnormP			# string numero desnormalizado positivo %
-00000391 : 51350513;   % 1278:  %
-00000392 : 04048063;   % 1279: 			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo %
-00000393 : 0fc14517;   % 1280: 		 	la 	a0, NumDesnormN			# string numero desnormalizado negativo %
-00000394 : 51050513;   % 1280:  %
-00000395 : 0340006f;   % 1281: 			j 	fimprintFloat			# imprime a string %
-00000396 : 0fc14517;   % 1283: eh0printFloat:		la 	a0, NumZero			# string do zero %
-00000397 : 50d50513;   % 1283:  %
-00000398 : 0280006f;   % 1284: 			j 	fimprintFloat 	 		# imprime a string %
-00000399 : 00030863;   % 1286: ehExp255printFloat: 	beq 	t1, zero, ehInfprintFloat	# se mantissa eh zero entao eh Infinito %
-0000039a : 0fc14517;   % 1288: ehNaNprintfFloat:	la 	a0, NumNaN			# string do NaN %
-0000039b : 51c50513;   % 1288:  %
-0000039c : 0180006f;   % 1289: 			j 	fimprintFloat			# imprime string %
-0000039d : 0fc14517;   % 1291: ehInfprintFloat:	la 	a0, NumInfP			# string do infinito positivo %
-0000039e : 4fc50513;   % 1291:  %
-0000039f : 00048663;   % 1292: 			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo %
-000003a0 : 0fc14517;   % 1293: 			la 	a0, NumInfN			# string do infinito negativo %
-000003a1 : 4fa50513;   % 1293:  %
-000003a2 : a11ff0ef;   % 1296: fimprintFloat:		jal 	printString			# imprime a string em a0 %
-000003a3 : 00012083;   % 1297: 			lw 	ra, 0(sp)			# recupera ra %
-000003a4 : 00410113;   % 1298: 			addi 	sp, sp, 4			# libera espaco %
-000003a5 : 00008067;   % 1299: 			ret					# retorna %
-000003a6 : ffc10113;   % 1308: readFloat: addi sp, sp, -4			# aloca espaco %
-000003a7 : 00112023;   % 1309: 	sw 	ra, 0(sp)			# salva ra %
-000003a8 : 0fc14517;   % 1310: 	la 	a0, TempBuffer			# endereco do FloatBuffer %
-000003a9 : 2a050513;   % 1310:  %
-000003aa : 02000593;   % 1311: 	li 	a1, 32				# numero maximo de caracteres %
-000003ab : bc9ff0ef;   % 1312: 	jal	readString			# le string, retorna a2 ultimo endereco e a3 numero de caracteres %
-000003ac : 00c00433;   % 1313: 	mv 	s0, a2				# ultimo endereco da string (antes do \0) %
-000003ad : 00d004b3;   % 1314: 	mv 	s1, a3				# numero de caracteres digitados %
-000003ae : 0fc14b97;   % 1315: 	la	s7, TempBuffer			# Endereco do primeiro caractere %
-000003af : 288b8b93;   % 1315:  %
-000003b0 : 017002b3;   % 1317: lePrimeiroreadFloat:	mv 	t0, s7		# Endereco de Inicio %
-000003b1 : 00028303;   % 1318: 	lb 	t1, 0(t0)				# le primeiro caractere %
-000003b2 : 06500213;   % 1319: 	li	tp, 'e'					# TP = 101 = 'e' %
-000003b3 : 02430863;   % 1320: 	beq 	t1, tp, insere0AreadFloat		# insere '0' antes %
-000003b4 : 04500213;   % 1321: 	li 	tp, 'E'					# TP = 69 = 'E' %
-000003b5 : 02430463;   % 1322: 	beq 	t1, tp, insere0AreadFloat		# insere '0' antes %
-000003b6 : 02e00213;   % 1323: 	li	tp, '.'					# TP = 46 = '.' %
-000003b7 : 02430063;   % 1324: 	beq 	t1, tp, insere0AreadFloat		#  insere '0' antes %
-000003b8 : 02b00213;   % 1325: 	li	tp, '+'					# TP = 43 = '+' %
-000003b9 : 00430863;   % 1326: 	beq 	t1, tp, pulaPrimreadChar		# pula o primeiro caractere %
-000003ba : 02d00213;   % 1327: 	li	tp, '-'					# TP = 45 = '-' %
-000003bb : 00430463;   % 1328: 	beq 	t1, tp, pulaPrimreadChar %
-000003bc : 03c0006f;   % 1329: 	j leUltimoreadFloat %
-000003bd : 001b8b93;   % 1331: pulaPrimreadChar: addi s7,s7,1			# incrementa o endereco inicial %
-000003be : fc9ff06f;   % 1332: 		  j lePrimeiroreadFloat		# volta a testar o novo primeiro caractere %
-000003bf : 008002b3;   % 1334: insere0AreadFloat: mv t0, s0			# endereco do ultimo caractere %
-000003c0 : 00140413;   % 1335: 		   addi s0, s0, 1		# desloca o ultimo endereco para o proximo %
-000003c1 : 00148493;   % 1336: 	   	   addi s1, s1, 1		# incrementa o num. caracteres %
-000003c2 : 000400a3;   % 1337: 	   	   sb 	zero, 1(s0)		# \NULL do final de string %
-000003c3 : 01700f33;   % 1338: 	   	   mv t5, s7			# primeiro caractere %
-000003c4 : 01e28a63;   % 1339: insere0Aloop:	   beq 	t0, t5, saiinsere0AreadFloat	# chegou no inicio entao fim %
-000003c5 : 00028303;   % 1340: 		   lb 	t1, 0(t0)		# le caractere %
-000003c6 : 006280a3;   % 1341: 		   sb 	t1, 1(t0)		# escreve no proximo %
-000003c7 : fff28293;   % 1342: 		   addi t0, t0, -1		# decrementa endereco %
-000003c8 : ff1ff06f;   % 1343: 		   j insere0Aloop		# volta ao loop %
-000003c9 : 03000313;   % 1344: saiinsere0AreadFloat: li t1, '0'		# ascii '0' %
-000003ca : 00628023;   % 1345: 		   sb t1, 0(t0)			# escreve '0' no primeiro caractere %
-000003cb : 00040303;   % 1347: leUltimoreadFloat: lb  	t1, 0(s0)			# le ultimo caractere %
-000003cc : 06500213;   % 1348: 		li	tp, 'e'				# TP = 101 = 'e' %
-000003cd : 00430c63;   % 1349: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
-000003ce : 04500213;   % 1350: 		li 	tp, 'E'				# TP = 69 = 'E' %
-000003cf : 00430863;   % 1351: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
-000003d0 : 02e00213;   % 1352: 		li	tp, '.'				# TP = 46 = '.' %
-000003d1 : 00430463;   % 1353: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
-000003d2 : 0180006f;   % 1354: 		j 	inicioreadFloat %
-000003d3 : 00140413;   % 1356: insere0PreadFloat: addi	s0, s0, 1		# desloca o ultimo endereco para o proximo %
-000003d4 : 00148493;   % 1357: 	   	   addi	s1, s1, 1		# incrementa o num. caracteres %
-000003d5 : 03000313;   % 1358: 		   li 	t1,'0'			# ascii '0' %
-000003d6 : 00640023;   % 1359: 		   sb 	t1,0(s0)		# escreve '0' no ultimo %
-000003d7 : 000400a3;   % 1360: 		   sb 	zero,1(s0)		# \null do final de string %
-000003d8 : d0007553;   % 1362: inicioreadFloat:  fcvt.s.w 	fa0, zero	# fa0 Resultado inicialmente zero %
-000003d9 : 00a00293;   % 1363: 		li 	t0, 10			# inteiro 10	 %
-000003da : d002f353;   % 1364: 		fcvt.s.w 	ft6, t0		# ft6 contem sempre o numero cte 10.0000 %
-000003db : 00100293;   % 1365: 		li 	t0, 1			# inteiro 1 %
-000003dc : d002f0d3;   % 1366: 		fcvt.s.w 	ft1, t0		# ft1 contem sempre o numero cte 1.0000	 %
-000003dd : 00140993;   % 1369: procuraEreadFloat:	addi 	s3, s0, 1			# inicialmente nao tem 'e' ou 'E' na string (fora da string) %
-000003de : 017002b3;   % 1370: 			mv 	t0, s7				# endereco inicial %
-000003df : 02828263;   % 1371: loopEreadFloat: 	beq 	t0, s0, naotemEreadFloat	# sai se nao encontrou 'e' %
-000003e0 : 00028303;   % 1372: 			lb 	t1, 0(t0)			# le o caractere %
-000003e1 : 06500213;   % 1373: 			li	tp, 'e'				# TP = 101 = 'e' %
-000003e2 : 00430a63;   % 1374: 			beq 	t1, tp, ehEreadFloat		# tem 'e' %
-000003e3 : 04500213;   % 1375: 			li 	tp, 'E'				# TP = 69 = 'E' %
-000003e4 : 00430663;   % 1376: 			beq	t1, tp, ehEreadFloat		# tem 'E' %
-000003e5 : 00128293;   % 1377: 			addi 	t0, t0, 1			# incrementa endereco %
-000003e6 : fe5ff06f;   % 1378: 			j 	loopEreadFloat			# volta ao loop %
-000003e7 : 005009b3;   % 1379: ehEreadFloat: 		mv 	s3, t0				# endereco do 'e' ou 'E' na string %
-000003e8 : 01300933;   % 1383: procuraPontoreadFloat:	mv 	s2, s3				# local inicial do ponto na string (='e' se existir) ou fora da string	 %
-000003e9 : 017002b3;   % 1384: 			mv 	t0, s7				# endereco inicial %
-000003ea : 00828e63;   % 1385: loopPontoreadFloat: 	beq 	t0, s0, naotemPontoreadFloat	# sai se nao encontrou '.' %
-000003eb : 00028303;   % 1386: 			lb 	t1, 0(t0)			# le o caractere %
-000003ec : 02e00213;   % 1387: 			li	tp, '.'				# TP = 46 = '.' %
-000003ed : 00430663;   % 1388: 			beq 	t1, tp, ehPontoreadFloat	# tem '.' %
-000003ee : 00128293;   % 1389: 			addi 	t0, t0, 1			# incrementa endereco %
-000003ef : fedff06f;   % 1390: 			j 	loopPontoreadFloat		# volta ao loop %
-000003f0 : 00500933;   % 1391: ehPontoreadFloat: 	mv 	s2, t0				# endereco do '.' na string %
-000003f1 : d0007153;   % 1395: intreadFloat:		fcvt.s.w 	ft2, zero		# zera parte inteira %
-000003f2 : fff90293;   % 1396: 			addi 	t0, s2, -1			# endereco do caractere antes do ponto %
-000003f3 : 201081d3;   % 1397: 			fmv.s 	ft3, ft1			# ft3 contem unidade/dezenas/centenas		 %
-000003f4 : 01700f33;   % 1398: 			mv 	t5, s7				# Primeiro Endereco %
-000003f5 : 03e2ca63;   % 1399: loopintreadFloat: 	blt 	t0, t5, fimintreadFloat		# sai se o endereco for < inicio da string %
-000003f6 : 00028303;   % 1400: 			lb 	t1, 0(t0)			# le o caracter %
-000003f7 : 03000213;   % 1401: 			li	tp, '0'				# TP = 48 = '0' %
-000003f8 : 10434863;   % 1402: 			blt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero %
-000003f9 : 03900213;   % 1403: 			li	tp, '9'				# TP = 57 = '9' %
-000003fa : 10624463;   % 1404: 			bgt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero %
-000003fb : fd030313;   % 1405: 			addi 	t1, t1, -48			# converte ascii para decimal %
-000003fc : d0037153;   % 1406: 			fcvt.s.w  ft2, t1			# digito lido em float %
-000003fd : 10317153;   % 1408: 			fmul.s 	ft2,ft2,ft3			# multiplica por un/dezena/centena %
-000003fe : 00257553;   % 1409: 			fadd.s 	fa0,fa0,ft2			# soma no resultado %
-000003ff : 1061f1d3;   % 1410: 			fmul.s 	ft3,ft3,ft6			# proxima dezena/centena %
-00000400 : fff28293;   % 1412: 			addi 	t0,t0,-1			# endereco anterior %
-00000401 : fd1ff06f;   % 1413: 			j 	loopintreadFloat		# volta ao loop %
-00000402 : d0007153;   % 1417: fracreadFloat:		fcvt.s.w 	ft2, zero		# zera parte fracionaria %
-00000403 : 00190293;   % 1418: 			addi 	t0, s2, 1			# endereco depois do ponto %
-00000404 : 1860f1d3;   % 1419: 			fdiv.s 	ft3, ft1, ft6			# ft3 inicial 0.1 %
-00000405 : 0332da63;   % 1421: loopfracreadFloat: 	bge 	t0, s3, fimfracreadFloat	# endereco eh 'e' 'E' ou >ultimo %
-00000406 : 00028303;   % 1422: 			lb 	t1, 0(t0)			# le o caracter %
-00000407 : 03000213;   % 1423: 			li	tp, '0'				# TP = 48 = '0' %
-00000408 : 0c434863;   % 1424: 			blt 	t1, tp, erroreadFloat		# nao eh valido %
-00000409 : 03900213;   % 1425: 			li	tp, '9'				# TP = 57 = '9' %
-0000040a : 0c624463;   % 1426: 			bgt 	t1, tp, erroreadFloat		# nao eh valido %
-0000040b : fd030313;   % 1427: 			addi 	t1, t1, -48			# converte ascii para decimal %
-0000040c : d0037153;   % 1428: 			fcvt.s.w 	ft2, t1			# digito lido em float		 %
-0000040d : 10317153;   % 1430: 			fmul.s 	ft2, ft2, ft3			# multiplica por ezena/centena %
-0000040e : 00257553;   % 1431: 			fadd.s 	fa0, fa0, ft2			# soma no resultado %
-0000040f : 1861f1d3;   % 1432: 			fdiv.s 	ft3, ft3, ft6			# proxima frac un/dezena/centena %
-00000410 : 00128293;   % 1434: 			addi 	t0, t0, 1			# proximo endereco %
-00000411 : fd1ff06f;   % 1435: 			j 	loopfracreadFloat		# volta ao loop		 %
-00000412 : d0007153;   % 1440: potreadFloat:		fcvt.s.w 	ft2, zero		# zera potencia %
-00000413 : 00198293;   % 1441: 			addi 	t0, s3, 1			# endereco seguinte ao 'e' %
-00000414 : 00000a13;   % 1442: 			li 	s4, 0				# sinal do expoente positivo %
-00000415 : 00028303;   % 1443: 			lb 	t1, 0(t0)			# le o caractere seguinte ao 'e' %
-00000416 : 02d00213;   % 1444: 			li	tp, '-'				# TP = 45 = '-' %
-00000417 : 00430863;   % 1445: 			beq	t1, tp, potsinalnegreadFloat	# sinal do expoente esta escrito e eh positivo %
-00000418 : 02b00213;   % 1446: 			li	tp, '+'				# TP = 43 = '+' %
-00000419 : 00430663;   % 1447: 			beq 	t1, tp, potsinalposreadFloat	# sinal do expoente eh negativo %
-0000041a : 00c0006f;   % 1448: 			j 	pulapotsinalreadFloat		# nao esta escrito o sinal do expoente %
-0000041b : 00100a13;   % 1449: potsinalnegreadFloat:	li 	s4, 1				# s4=1 expoente negativo %
-0000041c : 00128293;   % 1450: potsinalposreadFloat:	addi 	t0, t0, 1			# se tiver '-' ou '+' avanca para o proximo endereco %
-0000041d : 00500ab3;   % 1451: pulapotsinalreadFloat:	mv 	s5, t0 				# Neste ponto s5 contem o endereco do primeiro digito da pot e s4 o sinal do expoente		 %
-0000041e : 201081d3;   % 1453: 			fmv.s 	ft3, ft1			# ft3 un/dez/cen = 1 %
-0000041f : 00000393;   % 1456: expreadFloat:		li 	t2, 0				# zera expoente %
-00000420 : 008002b3;   % 1457: 			mv 	t0, s0				# endereco do ultimo caractere da string %
-00000421 : 00a00e13;   % 1458: 			li 	t3, 10				# numero dez %
-00000422 : 00100e93;   % 1459: 			li 	t4, 1				# und/dez/cent %
-00000423 : 0352c063;   % 1461: loopexpreadFloat:	blt 	t0, s5, fimexpreadFloat		# ainda nao eh o endereco do primeiro digito? %
-00000424 : 00028303;   % 1462: 			lb 	t1, 0(t0)			# le o caracter %
-00000425 : fd030313;   % 1463: 			addi 	t1, t1, -48			# converte ascii para decimal %
-00000426 : 03d30333;   % 1464: 			mul 	t1, t1, t4			# mul digito %
-00000427 : 006383b3;   % 1465: 			add 	t2, t2, t1			# soma ao exp %
-00000428 : 03ce8eb3;   % 1466: 			mul 	t4, t4, t3			# proxima casa decimal %
-00000429 : fff28293;   % 1467: 			addi 	t0, t0, -1			# endereco anterior %
-0000042a : fe5ff06f;   % 1468: 			j loopexpreadFloat			# volta ao loop %
-0000042b : 20108153;   % 1472: 			fmv.s 	ft2, ft1			# numero 10^exp  inicial=1 %
-0000042c : 206301d3;   % 1473: 			fmv.s 	ft3, ft6			# se o sinal for + ft3 eh 10 %
-0000042d : 00000213;   % 1474: 			li	tp, 0x00000000			# TP = ZERO %
-0000042e : 004a0463;   % 1475: 			beq 	s4, tp, sinalexpPosreadFloat	# se sinal exp positivo %
-0000042f : 1860f1d3;   % 1476: 			fdiv.s 	ft3, ft1, ft6			# se o final for - ft3 eh 0.1 %
-00000430 : 00000293;   % 1477: sinalexpPosreadFloat:	li 	t0, 0				# contador  %
-00000431 : 00728863;   % 1478: sinalexpreadFloat: 	beq 	t0, t2, fimsinalexpreadFloat	# se chegou ao fim %
-00000432 : 10317153;   % 1479: 			fmul.s 	ft2, ft2, ft3			# multiplica pelo fator 10 ou 0.1 %
-00000433 : 00128293;   % 1480: 			addi 	t0, t0, 1			# incrementa o contador %
-00000434 : ff5ff06f;   % 1481: 			j 	sinalexpreadFloat %
-00000435 : 10257553;   % 1484: 		fmul.s 	fa0, fa0, ft2		# multiplicacao final! %
-00000436 : 0fc14297;   % 1486: 		la 	t0, TempBuffer		# ajuste final do sinal do numero %
-00000437 : 06828293;   % 1486:  %
-00000438 : 00028303;   % 1487: 		lb 	t1, 0(t0)		# le primeiro caractere %
-00000439 : 02d00213;   % 1488: 		li	tp, '-'			# TP = 45 = '-' %
-0000043a : 00431463;   % 1489: 		bne 	t1, tp, fimreadFloat	# nao eh '-' entao fim %
-0000043b : 20a51553;   % 1490: 		fneg.s 	fa0, fa0		# nega o numero float %
-0000043c : 00012083;   % 1493: fimreadFloat: 	lw 	ra, 0(sp)		# recupera ra %
-0000043d : 00410113;   % 1494: 		addi 	sp, sp, 4		# libera espaco %
-0000043e : 00008067;   % 1495: 		ret				# retorna %
-0000043f : 10008237;   % 1503: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-00000440 : 00020213;   % 1503:  %
-00000441 : 00419863;   % 1503: <14> bne gp,tp,timeDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-00000442 : 01e00893;   % 1505: 	li 	a7,30				# Chama o ecall do Rars %
-00000443 : 00000073;   % 1506: 	ecall %
-00000444 : 0140006f;   % 1507: 	j 	fimTime				# saida %
-00000445 : ff2002b7;   % 1510: 		li 	t0, 0xFF200510		# carrega endereco do StopWatch %
-00000446 : 51028293;   % 1510:  %
-00000447 : 0002a503;   % 1511: 	 	lw 	a0, 0(t0)		# carrega o valor do contador de ms %
-00000448 : 00000593;   % 1513: 	 	li 	a1, 0x0000		# contador eh de 32 bits %
-00000449 : 00008067;   % 1514: fimTime: 	ret				# retorna %
-0000044a : 10008237;   % 1521: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-0000044b : 00020213;   % 1521:  %
-0000044c : 00419863;   % 1521: <14> bne gp,tp,sleepDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-0000044d : 02000893;   % 1523: 	li 	a7, 32				# Chama o ecall do Rars %
-0000044e : 00000073;   % 1524: 	ecall			 %
-0000044f : 01c0006f;   % 1525: 	j 	fimSleep			# Saida %
-00000450 : ff2002b7;   % 1528: 		li 	t0, 0xFF200510		# endereco StopWatch %
-00000451 : 51028293;   % 1528:  %
-00000452 : 0002a303;   % 1529: 		lw 	t1, 0(t0)		# carrega o contador de ms %
-00000453 : 006503b3;   % 1530: 		add 	t2, a0, t1		# soma com o tempo solicitado pelo usuario %
-00000454 : 0002a303;   % 1532: LoopSleep: 	lw 	t1, 0(t0)		# carrega o contador de ms %
-00000455 : fe734ee3;   % 1533: 		blt 	t1, t2, LoopSleep	# nao chegou ao fim volta ao loop %
-00000456 : 00008067;   % 1535: fimSleep: 	ret				# retorna %
-00000457 : ffc10113;   % 1547: printIntUnsigned:	addi 	sp, sp, -4			# Aloca espaco %
-00000458 : 00112023;   % 1548: 			sw 	ra, 0(sp)			# salva ra %
-00000459 : 0fc14297;   % 1549: 			la 	t0, TempBuffer			# carrega o Endereco do Buffer da String %
-0000045a : fdc28293;   % 1549:  %
-0000045b : 00a00393;   % 1551: 		 	li 	t2, 10				# carrega numero 10 %
-0000045c : 00000313;   % 1552: 			li 	t1, 0				# carrega numero de digitos com 0 %
-0000045d : 02755eb3;   % 1553: loop1printIntUnsigned:	divu 	t4, a0, t2			# divide por 10 (quociente) sem sinal %
-0000045e : 02757e33;   % 1554: 			remu 	t3, a0, t2			# resto sem sinal %
-0000045f : ffc10113;   % 1555: 			addi 	sp, sp, -4			# aloca espaco na pilha %
-00000460 : 01c12023;   % 1556: 			sw 	t3, 0(sp)			# coloca resto na pilha %
-00000461 : 01d00533;   % 1557: 			mv 	a0, t4				# atualiza o numero com o quociente %
-00000462 : 00130313;   % 1558: 			addi 	t1, t1, 1			# incrementa o contador de digitos %
-00000463 : fe0514e3;   % 1559: 			bne 	a0, zero, loop1printIntUnsigned		# verifica se o numero eh zero %
-00000464 : 00012383;   % 1561: loop2printIntUnsigned:	lw 	t2, 0(sp)			# le digito da pilha %
-00000465 : 00410113;   % 1562: 			addi 	sp, sp, 4			# libera espaco %
-00000466 : 03038393;   % 1563: 			addi 	t2, t2, 48			# converte o digito para ascii %
-00000467 : 00728023;   % 1564: 			sb 	t2, 0(t0)			# coloca caractere no buffer %
-00000468 : 00128293;   % 1565: 			addi 	t0, t0, 1			# incrementa endereco do buffer %
-00000469 : fff30313;   % 1566: 			addi 	t1, t1, -1			# decrementa contador de digitos %
-0000046a : fe0314e3;   % 1567: 			bne 	t1, zero, loop2printIntUnsigned	# eh o ultimo? %
-0000046b : 00028023;   % 1568: 			sb 	zero, 0(t0)			# insere \NULL na string %
-0000046c : 0fc14517;   % 1570: 			la 	a0, TempBuffer			# Endereco do buffer da string %
-0000046d : f9050513;   % 1570:  %
-0000046e : ee0ff0ef;   % 1571: 			jal 	printString			# chama o print string %
-0000046f : 00012083;   % 1573: 			lw 	ra, 0(sp)			# recupera a %
-00000470 : 00410113;   % 1574: 			addi 	sp, sp, 4			# libera espaco %
-00000471 : 00008067;   % 1575: fimprintIntUnsigned:	ret					# retorna %
-00000472 : 10008237;   % 1583: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
-00000473 : 00020213;   % 1583:  %
-00000474 : 00419863;   % 1583: <14> bne gp,tp,randomDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
-00000475 : 02900893;   % 1585: 	li 	a7,41			# Chama o ecall do Rars %
-00000476 : 00000073;   % 1586: 	ecall	 %
-00000477 : 0100006f;   % 1587: 	j 	fimRandom		# saida %
-00000478 : ff2002b7;   % 1589: randomDE2: 	li 	t0, 0xFF200514	# carrega endereco do LFSR %
-00000479 : 51428293;   % 1589:  %
-0000047a : 0002a503;   % 1590: 		lw 	a0, 0(t0)	# le a word em a0 %
-0000047b : 00008067;   % 1592: fimRandom:	ret			# retorna %
-0000047c : 00058c63;   % 1602: clsCLS:	beq 	a1, zero, frame0CLS %
-0000047d : ff100337;   % 1603: 	li      t1, 0xFF100000              # Memoria VGA 1 %
-0000047e : 00030313;   % 1603:  %
-0000047f : ff1133b7;   % 1604:    	li      t2, 0xFF112C00 %
-00000480 : c0038393;   % 1604:  %
-00000481 : 0140006f;   % 1605:    	j 	pulaCLS %
-00000482 : ff000337;   % 1606: frame0CLS: li      t1, 0xFF000000           # Memoria VGA 0 %
-00000483 : 00030313;   % 1606:  %
-00000484 : ff0133b7;   % 1607:    	   li      t2, 0xFF012C00   	 %
-00000485 : c0038393;   % 1607:  %
-00000486 : 0ff57513;   % 1608: pulaCLS: andi    a0, a0, 0x00FF %
-00000487 : 00a002b3;   % 1611:  	mv 	t0, a0 %
-00000488 : 00851513;   % 1612:  	slli 	a0, a0, 8 %
-00000489 : 00a2e2b3;   % 1613:  	or 	t0, t0, a0 %
-0000048a : 00851513;   % 1614:  	slli 	a0, a0, 8 %
-0000048b : 00a2e2b3;   % 1615:  	or 	t0, t0, a0 %
-0000048c : 00851513;   % 1616:  	slli 	a0, a0, 8 %
-0000048d : 00a2e2b3;   % 1617:  	or 	t0, t0, a0 %
-0000048e : 00730863;   % 1619: forCLS:	beq     t1, t2, fimCLS %
-0000048f : 00532023;   % 1620: 	sw      t0, 0(t1) %
-00000490 : 00430313;   % 1621:     	addi    t1, t1, 4 %
-00000491 : ff5ff06f;   % 1622:     	j       forCLS %
-00000492 : 00008067;   % 1624: fimCLS:	ret %
-00000493 : ff000837;   % 1633: BRESENHAM: 	li	a6, 0xFF000000           	# Memoria VGA 0 %
-00000494 : 00080813;   % 1633:  %
-00000495 : 00078663;   % 1634: 	   	beq	a5, zero, pulaBRES %
-00000496 : ff100837;   % 1635: 	   	li 	a6, 0xFF100000              # Memoria VGA 1 %
-00000497 : 00080813;   % 1635:  %
-00000498 : 14000893;   % 1637: pulaBRES: 	li 	a7, 320 %
-00000499 : 40b682b3;   % 1638: 	  	sub 	t0, a3, a1 %
-0000049a : 0002d463;   % 1639: 	  	bge 	t0, zero, PULAABRES %
-0000049b : 405002b3;   % 1640: 	  	sub 	t0, zero, t0 %
-0000049c : 40a60333;   % 1641: PULAABRES:	sub 	t1, a2, a0 %
-0000049d : 00035463;   % 1642: 	   	bge  	t1, zero, PULABBRES %
-0000049e : 40600333;   % 1643: 	   	sub  	t1, zero, t1	 %
-0000049f : 0262d263;   % 1644: PULABBRES: 	bge  	t0, t1, PULACBRES %
-000004a0 : 00a65e63;   % 1645: 	   	ble  	a0, a2, PULAC1BRES %
-000004a1 : 00a007b3;   % 1646: 	   	mv 	a5, a0 %
-000004a2 : 00c00533;   % 1647: 	   	mv 	a0, a2 %
-000004a3 : 00f00633;   % 1648: 	   	mv 	a2, a5 %
-000004a4 : 00b007b3;   % 1649: 	   	mv	a5, a1 %
-000004a5 : 00d005b3;   % 1650: 	   	mv 	a1, a3 %
-000004a6 : 00f006b3;   % 1651: 	   	mv 	a3, a5 %
-000004a7 : 0240006f;   % 1652: PULAC1BRES:	j PLOTLOWBRES %
-000004a8 : 00b6de63;   % 1654: PULACBRES: 	ble  	a1, a3, PULAC2BRES %
-000004a9 : 00a007b3;   % 1655: 	   	mv 	a5, a0 %
-000004aa : 00c00533;   % 1656: 	   	mv 	a0, a2 %
-000004ab : 00f00633;   % 1657: 	   	mv 	a2, a5 %
-000004ac : 00b007b3;   % 1658: 	   	mv 	a5, a1 %
-000004ad : 00d005b3;   % 1659: 	   	mv 	a1, a3 %
-000004ae : 00f006b3;   % 1660: 	   	mv 	a3, a5 %
-000004af : 0600006f;   % 1661: PULAC2BRES:	j PLOTHIGHBRES %
-000004b0 : 40a602b3;   % 1663: PLOTLOWBRES:	sub 	t0, a2, a0		# dx=x1-x0 %
-000004b1 : 40b68333;   % 1664: 	 	sub 	t1, a3, a1		# dy y1-y0 %
-000004b2 : 00100393;   % 1665: 	 	li  	t2, 1			# yi=1 %
-000004b3 : 00035663;   % 1666: 	 	bge 	t1, zero, PULA1BRES	# dy>=0 PULA %
-000004b4 : fff00393;   % 1667: 	 	li  	t2, -1			# yi=-1 %
-000004b5 : 40600333;   % 1668: 	 	sub 	t1, zero, t1		# dy=-dy %
-000004b6 : 00131e13;   % 1669: PULA1BRES:	slli 	t3, t1, 1		# 2*dy %
-000004b7 : 405e0e33;   % 1670: 		sub 	t3, t3, t0		# D=2*dy-dx %
-000004b8 : 00b00eb3;   % 1671: 		mv 	t4, a1			# y=y0 %
-000004b9 : 00a00f33;   % 1672: 		mv 	t5, a0			# x=x0 %
-000004ba : 031e8fb3;   % 1674: LOOPx1BRES:	mul 	t6, t4, a7		# y*320 %
-000004bb : 01ef8fb3;   % 1675: 		add 	t6, t6, t5		# y*320+x %
-000004bc : 010f8fb3;   % 1676: 		add 	t6, t6, a6		# 0xFF000000+y*320+x %
-000004bd : 00ef8023;   % 1677: 		sb 	a4, 0(t6)		# plot com cor a4 %
-000004be : 01c05863;   % 1679: 		ble 	t3, zero, PULA2BRES	# D<=0 %
-000004bf : 007e8eb3;   % 1680: 		add 	t4, t4, t2		# y=y+yi %
-000004c0 : 00129f93;   % 1681: 		slli 	t6, t0, 1		# 2*dx %
-000004c1 : 41fe0e33;   % 1682: 		sub 	t3, t3, t6		# D=D-2dx %
-000004c2 : 00131f93;   % 1683: PULA2BRES:	slli 	t6, t1, 1		# 2*dy %
-000004c3 : 01fe0e33;   % 1684: 		add 	t3, t3, t6		# D=D+2dx %
-000004c4 : 001f0f13;   % 1685: 		addi	t5, t5, 1 %
-000004c5 : fccf1ae3;   % 1686: 		bne 	t5, a2, LOOPx1BRES %
-000004c6 : 00008067;   % 1687: 		ret %
-000004c7 : 40a602b3;   % 1689: PLOTHIGHBRES: 	sub 	t0, a2, a0		# dx=x1-x0 %
-000004c8 : 40b68333;   % 1690: 	 	sub 	t1, a3, a1		# dy y1-y0 %
-000004c9 : 00100393;   % 1691: 	 	li 	t2, 1			# xi=1 %
-000004ca : 0002d663;   % 1692: 	 	bge 	t0, zero, PULA3BRES	# dy>=0 PULA %
-000004cb : fff00393;   % 1693: 	 	li 	t2, -1			# xi=-1 %
-000004cc : 405002b3;   % 1694: 	 	sub 	t0, zero, t0		# dx=-dx %
-000004cd : 00129e13;   % 1695: PULA3BRES:	slli 	t3, t0, 1		# 2*dx %
-000004ce : 406e0e33;   % 1696: 		sub 	t3, t3, t1		# D=2*dx-d1 %
-000004cf : 00a00eb3;   % 1697: 		mv 	t4, a0			# x=x0 %
-000004d0 : 00b00f33;   % 1698: 		mv 	t5, a1			# y=y0 %
-000004d1 : 031f0fb3;   % 1700: LOOPx2BRES:	mul 	t6, t5, a7		# y*320 %
-000004d2 : 01df8fb3;   % 1701: 		add 	t6, t6, t4		# y*320+x %
-000004d3 : 010f8fb3;   % 1702: 		add 	t6, t6, a6		# 0xFF000000+y*320+x %
-000004d4 : 00ef8023;   % 1703: 		sb 	a4, 0(t6)		# plot com cor a4 %
-000004d5 : 01c05863;   % 1705: 		ble 	t3, zero, PULA4BRES	# D<=0 %
-000004d6 : 007e8eb3;   % 1706: 		add 	t4, t4, t2		# x=x+xi %
-000004d7 : 00131f93;   % 1707: 		slli 	t6, t1, 1		# 2*dy %
-000004d8 : 41fe0e33;   % 1708: 		sub 	t3, t3, t6		# D=D-2dy %
-000004d9 : 00129f93;   % 1709: PULA4BRES: 	slli 	t6, t0, 1		# 2*dy %
-000004da : 01fe0e33;   % 1710: 		add 	t3, t3, t6		# D=D+2dx %
-000004db : 001f0f13;   % 1711: 		addi 	t5, t5, 1 %
-000004dc : fcdf1ae3;   % 1712: 		bne 	t5, a3, LOOPx2BRES %
-000004dd : 00008067;   % 1713: 		ret		 %
-000004de : ff2002b7;   % 1727: fdivDE2:	li 	 t0, 0xFF200710		# carrega endereco do FDIVIDER %
-000004df : 71028293;   % 1727:  %
-000004e0 : 0002a503;   % 1728: 		lw 	 a0, 0(t0)		# le a word em t0	No Rars le 0 %
-000004e1 : 00051463;   % 1729: 		bne 	 a0, zero, PULAFDIV 	# se a0=0 %
-000004e2 : 02000513;   % 1730: 		li 	 a0, 32			# faz divisor a0=32 %
-000004e3 : d00570d3;   % 1731: PULAFDIV:	fcvt.s.w ft1, a0		# converte em float %
-000004e4 : 03200293;   % 1732: 		li 	 t0, 50			# frequencia base = 50MHz %
-000004e5 : d002f053;   % 1733: 		fcvt.s.w ft0, t0		# converte em float %
-000004e6 : 18107553;   % 1734: 		fdiv.s   fa0, ft0, ft1		# 50/divisor %
-000004e7 : 00008067;   % 1735: fimFDIV:	ret				# retorna %
+00000000 : 00000217;   % 16: 	la tp,exceptionHandling	# carrega em tp o endereço base das rotinas do sistema ECALL %
+00000001 : 21c20213;   % 16:  %
+00000002 : 00521073;   % 17:  	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereço tp %
+00000003 : 0000e073;   % 18:  	csrrsi zero,0,1 	# seta o bit de habilitação de interrupção em ustatus (reg 0)	 %
+00000004 : 06100413;   % 20: 	li s0, 97		# ascii a %
+00000005 : 06400493;   % 21: 	li s1, 100		# ascii d %
+00000006 : 00000913;   % 22: 	li s2, 0		# deslocamento do aviao %
+00000007 : 00000993;   % 23: 	li s3, 0		# tecla pressionada %
+00000008 : 00100a13;   % 24: 	li s4, 1		# vidas %
+00000009 : 00000a93;   % 25: 	li s5, 0		# pontos %
+0000000a : 00000b13;   % 26: 	li s6, 0		# tiro %
+0000000b : 02000d93;   % 27: 	li s11, 32		# ascii <space> %
+0000000c : 0fc10517;   % 29: 	la a0, menu %
+0000000d : 2bc50513;   % 29:  %
+0000000e : 0b400593;   % 30: 	li a1, 180 %
+0000000f : 00000613;   % 31: 	li a2, 0 %
+00000010 : 0a4000ef;   % 32: 	jal SetPixels %
+00000011 : 080a0063;   % 35: 	beq s4, zero, GAME_OVER %
+00000012 : 170000ef;   % 36: 	jal MAPA		# desenha mapa %
+00000013 : 114000ef;   % 40: 	jal GetAxis			# para testar no rars deve comentar esta linha %
+00000014 : 0fc10517;   % 41: 	la a0, plane %
+00000015 : fb050513;   % 41:  %
+00000016 : 0a000593;   % 42: 	li a1, 160		# altura %
+00000017 : 0a000613;   % 43: 	li a2, 160		# posição  %
+00000018 : 01260633;   % 44: 	add a2, a2, s2		# deslocamento %
+00000019 : 00899863;   % 45: 	bne s3, s0, PULA1	# verifica se 'a' está pressionado %
+0000001a : 0fc10517;   % 46: 	la a0, plane_l %
+0000001b : 05850513;   % 46:  %
+0000001c : ffd90913;   % 47: 	addi s2, s2, -3 %
+0000001d : 00999863;   % 48: PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado %
+0000001e : 0fc10517;   % 49: 	la a0, plane_r %
+0000001f : 0dc50513;   % 49:  %
+00000020 : 00390913;   % 50: 	addi s2, s2, 3 %
+00000021 : 060000ef;   % 51: PULA2:	jal SetPixels		# Desenha avião %
+00000022 : 03b99063;   % 53: 	bne s3, s11, PULA3 %
+00000023 : 0fc10517;   % 54: 	la a0, bullet %
+00000024 : 24850513;   % 54:  %
+00000025 : 0a000593;   % 55: 	li a1, 160 %
+00000026 : 0a600613;   % 56: 	li a2, 166 %
+00000027 : 01260633;   % 57: 	add a2, a2, s2 %
+00000028 : 00c00b33;   % 58: 	mv s6, a2 %
+00000029 : 040000ef;   % 59: 	jal SetPixels %
+0000002a : 0f0000ef;   % 61: 	jal ControlaVida %
+0000002b : 00000993;   % 62: 	li s3,0 %
+0000002c : 094000ef;   % 63: 	jal KEY2		# recebe input do teclado %
+0000002d : 01000513;   % 65: 	li a0,16    %
+0000002e : 08400893;   % 66: 	li a7,132 %
+0000002f : 00000073;   % 67: 	ecall			# sleep 16ms %
+00000030 : f85ff06f;   % 68: j GAMELOOP %
+00000031 : 0fc10517;   % 69: GAME_OVER:	la a0, explosion1 %
+00000032 : 15050513;   % 69:  %
+00000033 : 0a000593;   % 70: 		li a1, 160 %
+00000034 : 0a000613;   % 71: 		li a2, 160 %
+00000035 : 01260633;   % 72: 		add a2, a2, s2 %
+00000036 : 00c000ef;   % 73: 		jal SetPixels %
+00000037 : 00a00893;   % 74: 		li a7, 10 %
+00000038 : 00000073;   % 75: 		ecall %
+00000039 : ff0002b7;   % 10: SetPixels:	li t0, 0xff000000 %
+0000003a : 00028293;   % 10:  %
+0000003b : 14000313;   % 11: 		li t1, 320 %
+0000003c : 026585b3;   % 12: 		mul a1, a1, t1		# Calcula a altura %
+0000003d : 00b282b3;   % 13: 		add t0, t0, a1		# Soma altura ao endereço inicial %
+0000003e : 00c282b3;   % 14: 		add t0, t0, a2		# Soma posição ao endereço inicial %
+0000003f : 00052383;   % 15: 		lw t2, 0(a0)		# largura do objeto %
+00000040 : 00452e03;   % 16: 		lw t3, 4(a0)		# altura do objeto %
+00000041 : 03c30333;   % 17: 		mul t1, t1, t3		 %
+00000042 : 00530333;   % 18: 		add t1, t1, t0		# Calcula endereço final da imagem %
+00000043 : 00538eb3;   % 19: 		add t4, t2, t0		# Calcula endereço final da linha %
+00000044 : 00850513;   % 20: 		addi a0, a0, 8		# Pega o primeiro pixel da figura %
+00000045 : 0262d663;   % 21: LOOP1:		bge t0, t1, FORA1 %
+00000046 : 01d28c63;   % 22: LOOP2:		beq t0, t4, FORA2 %
+00000047 : 00054e03;   % 23: 		lbu t3, 0(a0) %
+00000048 : 01c28023;   % 24: 		sb t3, 0(t0) %
+00000049 : 00128293;   % 25: 		addi t0, t0, 1 %
+0000004a : 00150513;   % 26: 		addi a0, a0, 1 %
+0000004b : fedff06f;   % 27: 		j LOOP2 %
+0000004c : 140e8e93;   % 28: FORA2:		addi t4, t4, 320 %
+0000004d : 407282b3;   % 29: 		sub t0, t0, t2 %
+0000004e : 14028293;   % 30: 		addi t0, t0, 320 %
+0000004f : fd9ff06f;   % 31: 		j LOOP1 %
+00000050 : 00008067;   % 32: FORA1:		ret %
+00000051 : ff200337;   % 2: KEY2:	li t1,0xFF200000		# carrega o endereço de controle do KDMMIO %
+00000052 : 00030313;   % 2:  %
+00000053 : 00032283;   % 3: 	lw t0,0(t1)			# Le bit de Controle Teclado %
+00000054 : 0012f293;   % 4: 	andi t0,t0,0x0001		# mascara o bit menos significativo %
+00000055 : 00028463;   % 5:    	beq t0,zero,FIM   	   	# Se não há tecla pressionada então vai para FIM %
+00000056 : 00432983;   % 6:   	lw s3,4(t1)  			# le o valor da tecla tecla %
+00000057 : 00008067;   % 7: FIM:	ret %
+00000058 : ff2002b7;   % 7: GetAxis:	li t0,0xFF200200		# endereco do CH0 %
+00000059 : 20028293;   % 7:  %
+0000005a : 01000313;   % 8: 			li t1,0x0010 %
+0000005b : 000013b7;   % 9: 			li t2,0x0ff0 %
+0000005c : ff038393;   % 9:  %
+0000005d : 0002ae03;   % 11: 			lw t3,0(t0)				# x %
+0000005e : 0042ae83;   % 12: 			lw t4,4(t0)				# y %
+0000005f : 01c35663;   % 13: 			ble t3, t1, AxisEsq %
+00000060 : 007e5863;   % 14: 			bge t3, t2, AxisDir %
+00000061 : 00008067;   % 15: 			ret %
+00000062 : 008009b3;   % 17: AxisEsq:	mv s3, s0 %
+00000063 : 00008067;   % 18: 			ret %
+00000064 : 009009b3;   % 19: AxisDir:	mv s3, s1 %
+00000065 : 00008067;   % 20: 			ret %
+00000066 : 04000293;   % 8: ControlaVida:	li t0, 64		# limite esquerda %
+00000067 : 10000313;   % 9: 		li t1, 256		# limite direita %
+00000068 : 00564863;   % 10: 		blt a2, t0, MORTE %
+00000069 : 00e60613;   % 11: 		addi a2, a2, 14		# largura do avião %
+0000006a : 00c34463;   % 12: 		bgt a2, t1, MORTE %
+0000006b : 0080006f;   % 13: 		j AINDAVIVO %
+0000006c : fffa0a13;   % 14: MORTE:		addi s4, s4, -1 %
+0000006d : 00008067;   % 15: AINDAVIVO:	ret %
+0000006e : ff000337;   % 9: MAPA:	li t1,0xFF000000	# endereco inicial da Memoria VGA - Frame 0 %
+0000006f : 00030313;   % 9:  %
+00000070 : ff00e3b7;   % 10: 	li t2,0xFF00E100	# endereco inicial do menu  %
+00000071 : 10038393;   % 10:  %
+00000072 : 91919e37;   % 11: 	li t3,0x91919191	# cor água %
+00000073 : 191e0e13;   % 11:  %
+00000074 : 63636eb7;   % 12: 	li t4,0x63636363	# cor chão %
+00000075 : 363e8e93;   % 12:  %
+00000076 : fff00f13;   % 13: 	li t5,-1		# contador %
+00000077 : 01000f93;   % 14: 	li t6,16 %
+00000078 : 04000513;   % 15: 	li a0,64 %
+00000079 : 05000593;   % 16: 	li a1,80 %
+0000007a : 02730663;   % 17: LOOP: 	beq t1,t2,FORA		# Se for o último endereço então sai do loop %
+0000007b : 001f0f13;   % 18: 	addi t5,t5,1 %
+0000007c : 02bf6633;   % 19: 	rem a2,t5,a1 %
+0000007d : 01f64a63;   % 20: 	blt a2,t6,TERRA %
+0000007e : 00a65863;   % 21: 	bge a2,a0,TERRA %
+0000007f : 01c32023;   % 22: AGUA:	sw t3,0(t1)		# escreve a word na memória VGA %
+00000080 : 00430313;   % 23: 	addi t1,t1,4		# soma 4 ao endereço %
+00000081 : fe5ff06f;   % 24: 	j LOOP			# volta a verificar %
+00000082 : 01d32023;   % 25: TERRA:	sw t4,0(t1) %
+00000083 : 00430313;   % 26: 	addi t1,t1,4 %
+00000084 : fd9ff06f;   % 27: 	j LOOP %
+00000085 : 00008067;   % 28: FORA:	ret %
+00000086 : 0420d073;   % 167: 	csrrwi zero,66,1	# caso ocorra dropdown vai gerar exceção de instrução inválida %
+00000087 : ff810113;   % 169: exceptionHandling:	addi 	sp, sp, -8 	# salva 2 registradores utilizados para comparar ucause %
+00000088 : 00512023;   % 170: 	sw 	t0, 0(sp) %
+00000089 : 01a12223;   % 171: 	sw 	s10, 4(sp) %
+0000008a : 04201d73;   % 173: 	csrrw 	s10, 66, zero 			# le o ucause e salva em s10 %
+0000008b : 00800293;   % 175: 	li 	t0, 8 %
+0000008c : 01a29a63;   % 176: 	bne 	t0, s10, errorExceptions  	# Não é ecall - nem precisa arrumar a pilha! %
+0000008d : 00012283;   % 178: 	lw 	t0, 0(sp)			# É ecall %
+0000008e : 00412d03;   % 179:     	lw 	s10, 4(sp)  			# recupera registradores usados %
+0000008f : 00810113;   % 180:     	addi 	sp, sp, 8			 %
+00000090 : 1e00006f;   % 181: 	j 	ecallException %
+00000091 : 04301df3;   % 187: errorExceptions: csrrw 	s11, 67, zero 	# le o utval da exceção e salva em s11	 %
+00000092 : 0c000513;   % 188: 	addi 	a0, zero, 0xc0 		## printa tela de azul %
+00000093 : 00000593;   % 189: 	addi 	a1, zero, 0 %
+00000094 : 09400893;   % 190: 	addi 	a7, zero, 148 %
+00000095 : 014010ef;   % 191: 	jal 	clsCLS %
+00000096 : 00000293;   % 194: End_Cause0:	li 	t0, 0 %
+00000097 : 03a29263;   % 195: 		bne 	t0, s10, End_Cause1 %
+00000098 : 0fc15517;   % 196: 		la 	a0, Cause0 %
+00000099 : 20050513;   % 196:  %
+0000009a : 00000593;   % 197: 		li 	a1, 0 %
+0000009b : 00100613;   % 198: 		li 	a2, 1 %
+0000009c : 0000c6b7;   % 199: 		li 	a3, 0x0000c0ff %
+0000009d : 0ff68693;   % 199:  %
+0000009e : 698000ef;   % 200: 		jal	printString %
+0000009f : 16c0006f;   % 201: 		j	End_uepc %
+000000a0 : 00100293;   % 204: End_Cause1:	li 	t0, 1 %
+000000a1 : 03a29263;   % 205: 		bne 	t0, s10, End_Cause2 %
+000000a2 : 0fc15517;   % 206: 		la 	a0, Cause1 %
+000000a3 : 20150513;   % 206:  %
+000000a4 : 00000593;   % 207: 		li 	a1, 0 %
+000000a5 : 00100613;   % 208: 		li 	a2, 1 %
+000000a6 : 0000c6b7;   % 209: 		li 	a3, 0x0000c0ff %
+000000a7 : 0ff68693;   % 209:  %
+000000a8 : 670000ef;   % 210: 		jal 	printString	 %
+000000a9 : 1440006f;   % 211: 		j	End_uepc %
+000000aa : 00200293;   % 214: End_Cause2:	li 	t0, 2 %
+000000ab : 03a29663;   % 215: 		bne 	t0, s10, End_Cause4 %
+000000ac : 0fc15517;   % 216: 		la 	a0, Cause2 %
+000000ad : 1fc50513;   % 216:  %
+000000ae : 00000593;   % 217: 		li 	a1, 0 %
+000000af : 00100613;   % 218: 		li 	a2, 1 %
+000000b0 : 0000c6b7;   % 219: 		li 	a3, 0x0000c0ff %
+000000b1 : 0ff68693;   % 219:  %
+000000b2 : 648000ef;   % 220: 		jal 	printString %
+000000b3 : 0fc15517;   % 222: 		la 	a0, Instr %
+000000b4 : 29850513;   % 222:  %
+000000b5 : 0e80006f;   % 223: 		j	End_utval %
+000000b6 : 00400293;   % 226: End_Cause4:	addi 	t0, zero, 4 %
+000000b7 : 03a29663;   % 227: 		bne	t0, s10, End_Cause5 %
+000000b8 : 0fc15517;   % 228: 		la 	a0, Cause4 %
+000000b9 : 1e950513;   % 228:  %
+000000ba : 00000593;   % 229: 		li 	a1, 0 %
+000000bb : 00100613;   % 230: 		li 	a2, 1 %
+000000bc : 0000c6b7;   % 231: 		li 	a3, 0x0000c0ff %
+000000bd : 0ff68693;   % 231:  %
+000000be : 618000ef;   % 232: 		jal	printString %
+000000bf : 0fc15517;   % 234: 		la 	a0, Addrs %
+000000c0 : 26050513;   % 234:  %
+000000c1 : 0b80006f;   % 235: 		j	End_utval %
+000000c2 : 00500293;   % 238: End_Cause5:	li 	t0, 5 %
+000000c3 : 03a29663;   % 239: 		bne 	t0, s10, End_Cause6 %
+000000c4 : 0fc15517;   % 240: 		la 	a0, Cause5 %
+000000c5 : 1db50513;   % 240:  %
+000000c6 : 00000593;   % 241: 		li 	a1, 0 %
+000000c7 : 00100613;   % 242: 		li 	a2, 1 %
+000000c8 : 0000c6b7;   % 243: 		li 	a3, 0x0000c0ff %
+000000c9 : 0ff68693;   % 243:  %
+000000ca : 5e8000ef;   % 244: 		jal 	printString	 %
+000000cb : 0fc15517;   % 246: 		la 	a0, Addrs %
+000000cc : 23050513;   % 246:  %
+000000cd : 0880006f;   % 247: 		j	End_utval %
+000000ce : 00600293;   % 250: End_Cause6:	li 	t0, 6 %
+000000cf : 03a29663;   % 251: 		bne 	t0, s10, End_Cause7 %
+000000d0 : 0fc15517;   % 252: 		la 	a0, Cause6 %
+000000d1 : 1c750513;   % 252:  %
+000000d2 : 00000593;   % 253: 		li 	a1, 0 %
+000000d3 : 00100613;   % 254: 		li 	a2, 1 %
+000000d4 : 0000c6b7;   % 255: 		li 	a3, 0x0000c0ff %
+000000d5 : 0ff68693;   % 255:  %
+000000d6 : 5b8000ef;   % 256: 		jal 	printString %
+000000d7 : 0fc15517;   % 258: 		la 	a0, Addrs %
+000000d8 : 20050513;   % 258:  %
+000000d9 : 0580006f;   % 259: 		j	End_utval %
+000000da : 00700293;   % 262: End_Cause7:	li 	t0, 7 %
+000000db : 03a29663;   % 263: 		bne 	t0, s10, End_CauseD %
+000000dc : 0fc15517;   % 264: 		la 	a0, Cause7 %
+000000dd : 1ba50513;   % 264:  %
+000000de : 00000593;   % 265: 		li 	a1, 0 %
+000000df : 00100613;   % 266: 		li 	a2, 1 %
+000000e0 : 0000c6b7;   % 267: 		li 	a3, 0x0000c0ff %
+000000e1 : 0ff68693;   % 267:  %
+000000e2 : 588000ef;   % 268: 		jal 	printString %
+000000e3 : 0fc15517;   % 270: 		la 	a0, Addrs %
+000000e4 : 1d050513;   % 270:  %
+000000e5 : 0280006f;   % 271: 		j	End_utval %
+000000e6 : 0fc15517;   % 274: End_CauseD: 	la 	a0, CauseD %
+000000e7 : 1af50513;   % 274:  %
+000000e8 : 00000593;   % 275: 		li 	a1, 0 %
+000000e9 : 00100613;   % 276: 		li 	a2, 1 %
+000000ea : 0000c6b7;   % 277: 		li 	a3, 0x0000c0ff %
+000000eb : 0ff68693;   % 277:  %
+000000ec : 560000ef;   % 278: 		jal 	printString %
+000000ed : 0fc15517;   % 280: 		la 	a0, Addrs %
+000000ee : 1a850513;   % 280:  %
+000000ef : 00000593;   % 283: End_utval:	li 	a1, 0 %
+000000f0 : 01800613;   % 284: 		li 	a2, 24 %
+000000f1 : 0000c6b7;   % 285: 		li 	a3, 0x000c0ff %
+000000f2 : 0ff68693;   % 285:  %
+000000f3 : 544000ef;   % 286: 		jal	printString %
+000000f4 : 01b00533;   % 288: 		mv 	a0, s11 %
+000000f5 : 03800593;   % 289: 		li 	a1, 56 %
+000000f6 : 01800613;   % 290: 		li 	a2, 24 %
+000000f7 : 0000c6b7;   % 291: 		li 	a3, 0x0000c0ff %
+000000f8 : 0ff68693;   % 291:  %
+000000f9 : 4b8000ef;   % 292: 		jal 	printHex %
+000000fa : 0fc15517;   % 295: End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exceção ocorreu %
+000000fb : 16f50513;   % 295:  %
+000000fc : 00000593;   % 296: 		li 	a1, 0 %
+000000fd : 00c00613;   % 297: 		li 	a2, 12 %
+000000fe : 0000c6b7;   % 298: 		li 	a3, 0x000c0ff %
+000000ff : 0ff68693;   % 298:  %
+00000100 : 510000ef;   % 299: 		jal 	printString %
+00000101 : 04101573;   % 301: 		csrrw 	a0, 65, zero	 %
+00000102 : 01c00593;   % 302: 		li	a1, 28 %
+00000103 : 00c00613;   % 303: 		li 	a2, 12 %
+00000104 : 0000c6b7;   % 304: 		li 	a3, 0x0000c0ff %
+00000105 : 0ff68693;   % 304:  %
+00000106 : 484000ef;   % 305: 		jal 	printHex	 %
+00000107 : 2500006f;   % 307: 		j goToExit 		# encerra execução %
+00000108 : ef810113;   % 314: ecallException:   addi    sp, sp, -264              # Salva todos os registradores na pilha %
+00000109 : 00112023;   % 315:     sw     x1,    0(sp) %
+0000010a : 00212223;   % 316:     sw     x2,    4(sp) %
+0000010b : 00312423;   % 317:     sw     x3,    8(sp) %
+0000010c : 00412623;   % 318:     sw     x4,   12(sp) %
+0000010d : 00512823;   % 319:     sw     x5,   16(sp) %
+0000010e : 00612a23;   % 320:     sw     x6,   20(sp) %
+0000010f : 00712c23;   % 321:     sw     x7,   24(sp) %
+00000110 : 00812e23;   % 322:     sw     x8,   28(sp) %
+00000111 : 02912023;   % 323:     sw     x9,   32(sp) %
+00000112 : 02a12223;   % 324:     sw     x10,  36(sp) %
+00000113 : 02b12423;   % 325:     sw     x11,  40(sp) %
+00000114 : 02c12623;   % 326:     sw     x12,  44(sp) %
+00000115 : 02d12823;   % 327:     sw     x13,  48(sp) %
+00000116 : 02e12a23;   % 328:     sw     x14,  52(sp) %
+00000117 : 02f12c23;   % 329:     sw     x15,  56(sp) %
+00000118 : 03012e23;   % 330:     sw     x16,  60(sp) %
+00000119 : 05112023;   % 331:     sw     x17,  64(sp) %
+0000011a : 05212223;   % 332:     sw     x18,  68(sp) %
+0000011b : 05312423;   % 333:     sw     x19,  72(sp) %
+0000011c : 05412623;   % 334:     sw     x20,  76(sp) %
+0000011d : 05512823;   % 335:     sw     x21,  80(sp) %
+0000011e : 05612a23;   % 336:     sw     x22,  84(sp) %
+0000011f : 05712c23;   % 337:     sw     x23,  88(sp) %
+00000120 : 05812e23;   % 338:     sw     x24,  92(sp) %
+00000121 : 07912023;   % 339:     sw     x25,  96(sp) %
+00000122 : 07a12223;   % 340:     sw     x26, 100(sp) %
+00000123 : 07b12423;   % 341:     sw     x27, 104(sp) %
+00000124 : 07c12623;   % 342:     sw     x28, 108(sp) %
+00000125 : 07d12823;   % 343:     sw     x29, 112(sp) %
+00000126 : 07e12a23;   % 344:     sw     x30, 116(sp) %
+00000127 : 07f12c23;   % 345:     sw     x31, 120(sp) %
+00000128 : 06012e27;   % 346:     fsw    f0,  124(sp) %
+00000129 : 08112027;   % 347:     fsw    f1,  128(sp) %
+0000012a : 08212227;   % 348:     fsw    f2,  132(sp) %
+0000012b : 08312427;   % 349:     fsw    f3,  136(sp) %
+0000012c : 08412627;   % 350:     fsw    f4,  140(sp) %
+0000012d : 08512827;   % 351:     fsw    f5,  144(sp) %
+0000012e : 08612a27;   % 352:     fsw    f6,  148(sp) %
+0000012f : 08712c27;   % 353:     fsw    f7,  152(sp) %
+00000130 : 08812e27;   % 354:     fsw    f8,  156(sp) %
+00000131 : 0a912027;   % 355:     fsw    f9,  160(sp) %
+00000132 : 0aa12227;   % 356:     fsw    f10, 164(sp) %
+00000133 : 0ab12427;   % 357:     fsw    f11, 168(sp) %
+00000134 : 0ac12627;   % 358:     fsw    f12, 172(sp) %
+00000135 : 0ad12827;   % 359:     fsw    f13, 176(sp) %
+00000136 : 0ae12a27;   % 360:     fsw    f14, 180(sp) %
+00000137 : 0af12c27;   % 361:     fsw    f15, 184(sp) %
+00000138 : 0b012e27;   % 362:     fsw    f16, 188(sp) %
+00000139 : 0d112027;   % 363:     fsw    f17, 192(sp) %
+0000013a : 0d212227;   % 364:     fsw    f18, 196(sp) %
+0000013b : 0d312427;   % 365:     fsw    f19, 200(sp) %
+0000013c : 0d412627;   % 366:     fsw    f20, 204(sp) %
+0000013d : 0d512827;   % 367:     fsw    f21, 208(sp) %
+0000013e : 0d612a27;   % 368:     fsw    f22, 212(sp) %
+0000013f : 0d712c27;   % 369:     fsw    f23, 216(sp) %
+00000140 : 0d812e27;   % 370:     fsw    f24, 220(sp) %
+00000141 : 0f912027;   % 371:     fsw    f25, 224(sp) %
+00000142 : 0fa12227;   % 372:     fsw    f26, 228(sp) %
+00000143 : 0fb12427;   % 373:     fsw    f27, 232(sp) %
+00000144 : 0fc12627;   % 374:     fsw    f28, 236(sp) %
+00000145 : 0fd12827;   % 375:     fsw    f29, 240(sp) %
+00000146 : 0fe12a27;   % 376:     fsw    f30, 244(sp) %
+00000147 : 0ff12c27;   % 377:     fsw    f31, 248(sp) %
+00000148 : 000002b3;   % 380:     add     t0, zero, zero %
+00000149 : 00000333;   % 381:     add     t1, zero, zero %
+0000014a : 000003b3;   % 382:     add     t2, zero, zero %
+0000014b : 00000e33;   % 383:     add     t3, zero, zero %
+0000014c : 00000eb3;   % 384:     add     t4, zero, zero %
+0000014d : 00000f33;   % 385:     add     t5, zero, zero %
+0000014e : 00000fb3;   % 386:     add     t6, zero, zero %
+0000014f : 00a00293;   % 391:     addi    t0, zero, 10 %
+00000150 : 13128663;   % 392:     beq     t0, a7, goToExit          # ecall exit %
+00000151 : 06e00293;   % 393:     addi    t0, zero, 110 %
+00000152 : 13128263;   % 394:     beq     t0, a7, goToExit          # ecall exit %
+00000153 : 00100293;   % 396:     addi    t0, zero, 1               # ecall 1 = print int %
+00000154 : 13128a63;   % 397:     beq     t0, a7, goToPrintInt %
+00000155 : 06500293;   % 398:     addi    t0, zero, 101             # ecall 1 = print int %
+00000156 : 13128663;   % 399:     beq     t0, a7, goToPrintInt %
+00000157 : 00200293;   % 401:     addi    t0, zero, 2               # ecall 2 = print float %
+00000158 : 13128e63;   % 402:     beq     t0, a7, goToPrintFloat %
+00000159 : 06600293;   % 403:     addi    t0, zero, 102             # ecall 2 = print float %
+0000015a : 13128a63;   % 404:     beq     t0, a7, goToPrintFloat %
+0000015b : 00400293;   % 406:     addi    t0, zero, 4               # ecall 4 = print string %
+0000015c : 11128e63;   % 407:     beq     t0, a7, goToPrintString %
+0000015d : 06800293;   % 408:     addi    t0, zero, 104             # ecall 4 = print string %
+0000015e : 11128a63;   % 409:     beq     t0, a7, goToPrintString %
+0000015f : 00500293;   % 411:     addi    t0, zero, 5               # ecall 5 = read int %
+00000160 : 13128663;   % 412:     beq     t0, a7, goToReadInt %
+00000161 : 06900293;   % 413:     addi    t0, zero, 105             # ecall 5 = read int %
+00000162 : 13128263;   % 414:     beq     t0, a7, goToReadInt %
+00000163 : 00600293;   % 416:     addi    t0, zero, 6               # ecall 6 = read float %
+00000164 : 13128663;   % 417:     beq     t0, a7, goToReadFloat %
+00000165 : 06a00293;   % 418:     addi    t0, zero, 106             # ecall 6 = read float %
+00000166 : 13128263;   % 419:     beq     t0, a7, goToReadFloat %
+00000167 : 00800293;   % 421:     addi    t0, zero, 8               # ecall 8 = read string %
+00000168 : 11128a63;   % 422:     beq     t0, a7, goToReadString %
+00000169 : 06c00293;   % 423:     addi    t0, zero, 108             # ecall 8 = read string %
+0000016a : 11128663;   % 424:     beq     t0, a7, goToReadString %
+0000016b : 00b00293;   % 426:     addi    t0, zero, 11              # ecall 11 = print char %
+0000016c : 0f128263;   % 427:     beq     t0, a7, goToPrintChar %
+0000016d : 06f00293;   % 428:     addi    t0, zero, 111             # ecall 11 = print char %
+0000016e : 0d128e63;   % 429:     beq     t0, a7, goToPrintChar %
+0000016f : 00c00293;   % 431:     addi    t0, zero, 12              # ecall 12 = read char %
+00000170 : 0f128263;   % 432:     beq     t0, a7, goToReadChar %
+00000171 : 07000293;   % 433:     addi    t0, zero, 112             # ecall 12 = read char %
+00000172 : 0d128e63;   % 434:     beq     t0, a7, goToReadChar %
+00000173 : 01e00293;   % 436:     addi    t0, zero, 30              # ecall 30 = time %
+00000174 : 11128663;   % 437:     beq     t0, a7, goToTime %
+00000175 : 08200293;   % 438:     addi    t0, zero, 130             # ecall 30 = time %
+00000176 : 11128263;   % 439:     beq     t0, a7, goToTime %
+00000177 : 02000293;   % 441:     addi    t0, zero, 32              # ecall 32 = sleep %
+00000178 : 11128263;   % 442:     beq     t0, a7, goToSleep %
+00000179 : 08400293;   % 443:     addi    t0, zero, 132             # ecall 32 = sleep %
+0000017a : 0f128e63;   % 444:     beq     t0, a7, goToSleep %
+0000017b : 02400293;   % 446:     addi    t0, zero, 36	      # ecall 36 = print int unsigned %
+0000017c : 11128263;   % 447:     beq     t0, a7, goToPrintIntUnsigned %
+0000017d : 08800293;   % 448:     addi    t0, zero, 136	      # ecall 36 = print int unsigned %
+0000017e : 0f128e63;   % 449:     beq     t0, a7, goToPrintIntUnsigned %
+0000017f : 02900293;   % 451:     addi    t0, zero, 41              # ecall 41 = random %
+00000180 : 0f128663;   % 452:     beq     t0, a7, goToRandom %
+00000181 : 08d00293;   % 453:     addi    t0, zero, 141             # ecall 41 = random %
+00000182 : 0f128263;   % 454:     beq     t0, a7, goToRandom %
+00000183 : 02200293;   % 456:     addi    t0, zero, 34       		# ecall 34 = print hex %
+00000184 : 0b128a63;   % 457:     beq     t0, a7, goToPrintHex %
+00000185 : 08600293;   % 458:     addi    t0, zero, 134		# ecall 34 = print hex %
+00000186 : 0b128663;   % 459:     beq     t0, a7, goToPrintHex %
+00000187 : 01f00293;   % 461:     addi    t0, zero, 31              # ecall 31 = MIDI out %
+00000188 : 0b128663;   % 462:     beq     t0, a7, goToMidiOut       # Generate tone and return immediately %
+00000189 : 08300293;   % 463:     addi    t0, zero, 131             # ecall 31 = MIDI out %
+0000018a : 0b128263;   % 464:     beq     t0, a7, goToMidiOut %
+0000018b : 02100293;   % 466:     addi    t0, zero, 33              # ecall 33 = MIDI out synchronous %
+0000018c : 0b128263;   % 467:     beq     t0, a7, goToMidiOutSync   # Generate tone and return upon tone completion %
+0000018d : 08500293;   % 468:     addi    t0, zero, 133             # ecall 33 = MIDI out synchronous %
+0000018e : 09128e63;   % 469:     beq     t0, a7, goToMidiOutSync %
+0000018f : 03000293;   % 471:     addi    t0, zero, 48              # ecall 48 = CLS %
+00000190 : 0b128e63;   % 472:     beq     t0, a7, goToCLS %
+00000191 : 09400293;   % 473:     addi    t0, zero, 148              # ecall 48 = CLS %
+00000192 : 0b128a63;   % 474:     beq     t0, a7, goToCLS %
+00000193 : 02f00293;   % 476:     addi    t0, zero, 47              # ecall 47 = DrawLine %
+00000194 : 0b128a63;   % 477:     beq     t0, a7, goToBRES %
+00000195 : 09300293;   % 478:     addi    t0, zero, 147              # ecall 47 = DrawLine %
+00000196 : 0b128663;   % 479:     beq     t0, a7, goToBRES     %
+00000197 : 02e00293;   % 481:     addi    t0, zero, 46              # ecall 47 = DrawLine %
+00000198 : 0b128663;   % 482:     beq     t0, a7, goToFDIV %
+00000199 : 09200293;   % 483:     addi    t0, zero, 146              # ecall 47 = DrawLine %
+0000019a : 0b128263;   % 484:     beq     t0, a7, goToFDIV         %
+0000019b : 10008237;   % 487: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+0000019c : 00020213;   % 487:  %
+0000019d : 00419663;   % 487: <14> bne gp,tp,goToExitDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+0000019e : 00a00893;   % 488: 		li 	a7, 10			# chama o ecall normal do Rars %
+0000019f : 00000073;   % 489: 		ecall				# exit ecall %
+000001a0 : 0000006f;   % 491: 	goToExitDE2:	j 	goToExitDE2		# trava o processador : Não tem sistema operacional! %
+000001a1 : 198000ef;   % 493: 	goToPrintInt:	jal     printInt               	# chama printInt %
+000001a2 : 08c0006f;   % 494: 		j       endEcall %
+000001a3 : 284000ef;   % 496: 	goToPrintString: jal     printString           	# chama printString %
+000001a4 : 0840006f;   % 497: 		j       endEcall %
+000001a5 : 2c4000ef;   % 499: 	goToPrintChar:	jal     printChar		# chama printChar %
+000001a6 : 07c0006f;   % 500: 		j       endEcall %
+000001a7 : 668000ef;   % 502: 	goToPrintFloat:	jal     printFloat		# chama printFloat %
+000001a8 : 0740006f;   % 503: 		j       endEcall %
+000001a9 : 3a8000ef;   % 505: 	goToReadChar:	jal     readChar              	# chama readChar %
+000001aa : 06c0006f;   % 506: 		j       endEcall %
+000001ab : 4d0000ef;   % 508: 	goToReadInt:   	jal     readInt                 # chama readInt %
+000001ac : 0640006f;   % 509: 		j       endEcall %
+000001ad : 438000ef;   % 511: 	goToReadString:	jal     readString              # chama readString %
+000001ae : 05c0006f;   % 512: 		j       endEcall %
+000001af : 055000ef;   % 514: 	goToReadFloat:	jal     readFloat               # chama readFloat %
+000001b0 : 0540006f;   % 515: 		j       endEcall %
+000001b1 : 1d8000ef;   % 517: 	goToPrintHex:	jal     printHex                # chama printHex %
+000001b2 : 04c0006f;   % 518: 		j       endEcall %
+000001b3 : 530000ef;   % 520: 	goToMidiOut:	jal     midiOut                 # chama MIDIout %
+000001b4 : 0440006f;   % 521: 		j       endEcall %
+000001b5 : 5a0000ef;   % 523: 	goToMidiOutSync: jal     midiOutSync   		# chama MIDIoutSync %
+000001b6 : 03c0006f;   % 524: 		j       endEcall %
+000001b7 : 299000ef;   % 526: 	goToTime:	jal     Time                    # chama time %
+000001b8 : 0340006f;   % 527: 		j       endEcall %
+000001b9 : 2bd000ef;   % 529: 	goToSleep:	jal     sleep                  	# chama sleep %
+000001ba : 02c0006f;   % 530: 		j       endEcall %
+000001bb : 355000ef;   % 532: 	goToRandom:	jal     random                 	# chama random %
+000001bc : 0240006f;   % 533: 		j       endEcall %
+000001bd : 2e1000ef;   % 535: 	goToPrintIntUnsigned: jal     printIntUnsigned	# chama printIntUnsigned %
+000001be : 01c0006f;   % 536: 		j	endEcall %
+000001bf : 36d000ef;   % 538: 	goToCLS:	jal     clsCLS                 	# chama CLS %
+000001c0 : 0140006f;   % 539: 		j       endEcall %
+000001c1 : 3c1000ef;   % 541: 	goToBRES:	jal     BRESENHAM               # chama BRESENHAM %
+000001c2 : 00c0006f;   % 542: 		j       endEcall    	 %
+000001c3 : 4e5000ef;   % 544:  	goToFDIV:	jal	FDIVISOR 	              # chama Leitura do divisor de frequencias %
+000001c4 : 0040006f;   % 545: 		j       endEcall      		    				    		    				    		    		 %
+000001c5 : 00012083;   % 547: endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha %
+000001c6 : 00412103;   % 548: 		lw	x2,   4(sp)	 %
+000001c7 : 00812183;   % 549: 		lw	x3,   8(sp)	 %
+000001c8 : 00c12203;   % 550: 		lw	x4,  12(sp)      	 %
+000001c9 : 01012283;   % 551: 		lw	x5,  16(sp)      	 %
+000001ca : 01412303;   % 552: 		lw	x6,  20(sp)	 %
+000001cb : 01812383;   % 553: 		lw	x7,  24(sp) %
+000001cc : 01c12403;   % 554: 		lw	x8,  28(sp) %
+000001cd : 02012483;   % 555: 		lw	x9,  32(sp) %
+000001ce : 02812583;   % 557: 		lw     x11, 40(sp) %
+000001cf : 02c12603;   % 558: 		lw     x12, 44(sp) %
+000001d0 : 03012683;   % 559: 		lw     x13, 48(sp) %
+000001d1 : 03412703;   % 560: 		lw     x14, 52(sp) %
+000001d2 : 03812783;   % 561: 		lw     x15, 56(sp) %
+000001d3 : 03c12803;   % 562: 		lw     x16, 60(sp) %
+000001d4 : 04012883;   % 563: 		lw     x17, 64(sp) %
+000001d5 : 04412903;   % 564: 		lw     x18, 68(sp) %
+000001d6 : 04812983;   % 565: 		lw     x19, 72(sp) %
+000001d7 : 04c12a03;   % 566: 		lw     x20, 76(sp) %
+000001d8 : 05012a83;   % 567: 		lw     x21, 80(sp) %
+000001d9 : 05412b03;   % 568: 		lw     x22, 84(sp) %
+000001da : 05812b83;   % 569: 		lw     x23, 88(sp) %
+000001db : 05c12c03;   % 570: 		lw     x24, 92(sp) %
+000001dc : 06012c83;   % 571: 		lw     x25, 96(sp) %
+000001dd : 06412d03;   % 572: 		lw     x26, 100(sp) %
+000001de : 06812d83;   % 573: 		lw     x27, 104(sp) %
+000001df : 06c12e03;   % 574: 		lw     x28, 108(sp) %
+000001e0 : 07012e83;   % 575: 		lw     x29, 112(sp) %
+000001e1 : 07412f03;   % 576: 		lw     x30, 116(sp) %
+000001e2 : 07812f83;   % 577: 		lw     x31, 120(sp) %
+000001e3 : 07c12007;   % 578: 		flw    f0,  124(sp) %
+000001e4 : 08012087;   % 579: 		flw    f1,  128(sp) %
+000001e5 : 08412107;   % 580: 		flw    f2,  132(sp) %
+000001e6 : 08812187;   % 581: 		flw    f3,  136(sp) %
+000001e7 : 08c12207;   % 582: 		flw    f4,  140(sp) %
+000001e8 : 09012287;   % 583: 		flw    f5,  144(sp) %
+000001e9 : 09412307;   % 584: 		flw    f6,  148(sp) %
+000001ea : 09812387;   % 585: 		flw    f7,  152(sp) %
+000001eb : 09c12407;   % 586: 		flw    f8,  156(sp) %
+000001ec : 0a012487;   % 587: 		flw    f9,  160(sp) %
+000001ed : 0a812587;   % 589: 		flw    f11, 168(sp) %
+000001ee : 0ac12607;   % 590: 		flw    f12, 172(sp) %
+000001ef : 0b012687;   % 591: 		flw    f13, 176(sp) %
+000001f0 : 0b412707;   % 592: 		flw    f14, 180(sp) %
+000001f1 : 0b812787;   % 593: 		flw    f15, 184(sp) %
+000001f2 : 0bc12807;   % 594: 		flw    f16, 188(sp) %
+000001f3 : 0c012887;   % 595: 		flw    f17, 192(sp) %
+000001f4 : 0c412907;   % 596: 		flw    f18, 196(sp) %
+000001f5 : 0c812987;   % 597: 		flw    f19, 200(sp) %
+000001f6 : 0cc12a07;   % 598: 		flw    f20, 204(sp) %
+000001f7 : 0d012a87;   % 599: 		flw    f21, 208(sp) %
+000001f8 : 0d412b07;   % 600: 		flw    f22, 212(sp) %
+000001f9 : 0d812b87;   % 601: 		flw    f23, 216(sp) %
+000001fa : 0dc12c07;   % 602: 		flw    f24, 220(sp) %
+000001fb : 0e012c87;   % 603: 		flw    f25, 224(sp) %
+000001fc : 0e412d07;   % 604: 		flw    f26, 228(sp) %
+000001fd : 0e812d87;   % 605: 		flw    f27, 232(sp) %
+000001fe : 0ec12e07;   % 606: 		flw    f28, 236(sp) %
+000001ff : 0f012e87;   % 607: 		flw    f29, 240(sp) %
+00000200 : 0f412f07;   % 608: 		flw    f30, 244(sp) %
+00000201 : 0f812f87;   % 609: 		flw    f31, 248(sp) %
+00000202 : 10810113;   % 611: 		addi    sp, sp, 264 %
+00000203 : 04101273;   % 613: 		csrrw 	tp, 65, zero	# le o valor de EPC salvo no registrador uepc (reg 65) %
+00000204 : 00420213;   % 614: 		addi 	tp, tp, 4	# soma 4 para obter a instrucao seguinte ao ecall %
+00000205 : 04121073;   % 615: 		csrrw 	zero, 65, tp	# coloca no registrador uepc %
+00000206 : 00200073;   % 616: 		uret			# retorna PC=uepc %
+00000207 : ffc10113;   % 629: printInt:	addi 	sp, sp, -4			# Aloca espaco %
+00000208 : 00112023;   % 630: 		sw 	ra, 0(sp)			# salva ra %
+00000209 : 0fc15297;   % 631: 		la 	t0, TempBuffer			# carrega o Endereco do Buffer da String %
+0000020a : 9f428293;   % 631:  %
+0000020b : 00055a63;   % 633: 		bge 	a0, zero, ehposprintInt		# Se eh positvo %
+0000020c : 02d00313;   % 634: 		li 	t1, '-'				# carrega o sinal - %
+0000020d : 00628023;   % 635: 		sb 	t1, 0(t0)			# coloca no buffer %
+0000020e : 00128293;   % 636: 		addi 	t0, t0, 1			# incrementa endereco do buffer %
+0000020f : 40a00533;   % 637: 		sub 	a0, zero, a0			# torna o numero positivo %
+00000210 : 00a00393;   % 639: ehposprintInt:  li 	t2, 10				# carrega numero 10 %
+00000211 : 00000313;   % 640: 		li 	t1, 0				# carrega numero de digitos com 0 %
+00000212 : 02754eb3;   % 642: loop1printInt:	div 	t4, a0, t2			# divide por 10 (quociente) %
+00000213 : 02756e33;   % 643: 		rem 	t3, a0, t2			# resto %
+00000214 : ffc10113;   % 644: 		addi 	sp, sp, -4			# aloca espaco na pilha %
+00000215 : 01c12023;   % 645: 		sw 	t3, 0(sp)			# coloca resto na pilha %
+00000216 : 01d00533;   % 646: 		mv 	a0, t4				# atualiza o numero com o quociente %
+00000217 : 00130313;   % 647: 		addi 	t1, t1, 1			# incrementa o contador de digitos %
+00000218 : fe0514e3;   % 648: 		bne 	a0, zero, loop1printInt		# verifica se o numero eh zero %
+00000219 : 00012383;   % 650: loop2printInt:	lw 	t2, 0(sp)			# le digito da pilha %
+0000021a : 00410113;   % 651: 		addi 	sp, sp, 4			# libera espaco %
+0000021b : 03038393;   % 652: 		addi 	t2, t2, 48			# converte o digito para ascii %
+0000021c : 00728023;   % 653: 		sb 	t2, 0(t0)			# coloca caractere no buffer %
+0000021d : 00128293;   % 654: 		addi 	t0, t0, 1			# incrementa endereco do buffer %
+0000021e : fff30313;   % 655: 		addi 	t1, t1, -1			# decrementa contador de digitos %
+0000021f : fe0314e3;   % 656: 		bne 	t1, zero, loop2printInt		# eh o ultimo? %
+00000220 : 00028023;   % 657: 		sb 	zero, 0(t0)			# insere \NULL na string %
+00000221 : 0fc15517;   % 659: 		la 	a0, TempBuffer			# Endereco do buffer da srting %
+00000222 : 99450513;   % 659:  %
+00000223 : 084000ef;   % 660: 		jal 	printString			# chama o print string %
+00000224 : 00012083;   % 662: 		lw 	ra, 0(sp)			# recupera a %
+00000225 : 00410113;   % 663: 		addi 	sp, sp, 4			# libera espaco %
+00000226 : 00008067;   % 664: fimprintInt:	ret					# retorna %
+00000227 : ffc10113;   % 676: printHex:	addi    sp, sp, -4    		# aloca espaco %
+00000228 : 00112023;   % 677:     		sw      ra, 0(sp)		# salva ra %
+00000229 : 00a002b3;   % 678: 		mv 	t0, a0			# Inteiro de 32 bits a ser impresso em Hexa %
+0000022a : 0fc15317;   % 679: 		la 	t1, TabelaHexASCII	# endereco da tabela HEX->ASCII %
+0000022b : b7030313;   % 679:  %
+0000022c : 0fc15397;   % 680: 		la 	t2, TempBuffer		# onde a string sera montada %
+0000022d : 96838393;   % 680:  %
+0000022e : 03000e13;   % 682: 		li 	t3,'0'			# Caractere '0' %
+0000022f : 01c38023;   % 683: 		sb 	t3,0(t2)		# Escreve '0' no Buffer da String %
+00000230 : 07800e13;   % 684: 		li 	t3,'x'			# Caractere 'x' %
+00000231 : 01c380a3;   % 685: 		sb 	t3,1(t2)		# Escreve 'x' no Buffer da String %
+00000232 : 00238393;   % 686: 		addi 	t2,t2,2			# novo endereco inicial da string %
+00000233 : 01c00e13;   % 688: 		li 	t3, 28			# contador de nibble   inicio = 28 %
+00000234 : 020e4263;   % 689: loopprintHex:	blt 	t3, zero, fimloopprintHex	# terminou? t3<0? %
+00000235 : 01c2deb3;   % 690: 		srl 	t4, t0, t3		# desloca o nibble para direita %
+00000236 : 00fefe93;   % 691: 		andi 	t4, t4, 0x000F		# mascara o nibble	 %
+00000237 : 01d30eb3;   % 692: 		add 	t4, t1, t4		# endereco do ascii do nibble %
+00000238 : 000e8e83;   % 693: 		lb 	t4, 0(t4)		# le ascii do nibble %
+00000239 : 01d38023;   % 694: 		sb 	t4, 0(t2)		# armazena o ascii do nibble no buffer da string %
+0000023a : 00138393;   % 695: 		addi 	t2, t2, 1		# incrementa o endereco do buffer %
+0000023b : ffce0e13;   % 696: 		addi 	t3, t3, -4		# decrementa o numero do nibble %
+0000023c : fe1ff06f;   % 697: 		j 	loopprintHex %
+0000023d : 00038023;   % 699: fimloopprintHex: sb 	zero,0(t2)		# grava \null na string %
+0000023e : 0fc15517;   % 700: 		la 	a0, TempBuffer		# Argumento do print String %
+0000023f : 92050513;   % 700:  %
+00000240 : 010000ef;   % 701:     		jal	printString		# Chama o print string %
+00000241 : 00012083;   % 703: 		lw 	ra, 0(sp)		# recupera ra %
+00000242 : 00410113;   % 704: 		addi 	sp, sp, 4		# libera espaco %
+00000243 : 00008067;   % 705: fimprintHex:	ret				# retorna %
+00000244 : ff810113;   % 716: printString:	addi	sp, sp, -8			# aloca espaco %
+00000245 : 00112023;   % 717:     		sw	ra, 0(sp)			# salva ra %
+00000246 : 00812223;   % 718:     		sw	s0, 4(sp)			# salva s0 %
+00000247 : 00a00433;   % 719:     		mv	s0, a0              		# s0 = endereco do caractere na string %
+00000248 : 00040503;   % 721: loopprintString:lb	a0, 0(s0)                 	# le em a0 o caracter a ser impresso %
+00000249 : 02050263;   % 723:     		beq     a0, zero, fimloopprintString	# string ASCIIZ termina com NULL %
+0000024a : 030000ef;   % 725:     		jal     printChar       		# imprime char %
+0000024b : 00858593;   % 727: 		addi    a1, a1, 8                 	# incrementa a coluna %
+0000024c : 13900f93;   % 728: 		li 	t6, 313		 %
+0000024d : 01f5c663;   % 729: 		blt	a1, t6, NaoPulaLinha	    	# se ainda tiver lugar na linha %
+0000024e : 00860613;   % 730:     		addi    a2, a2, 8                 	# incrementa a linha %
+0000024f : 000005b3;   % 731:     		mv    	a1, zero			# volta a coluna zero %
+00000250 : 00140413;   % 733: NaoPulaLinha:	addi    s0, s0, 1			# proximo caractere %
+00000251 : fddff06f;   % 734:     		j       loopprintString       		# volta ao loop %
+00000252 : 00012083;   % 736: fimloopprintString:	lw      ra, 0(sp)    		# recupera ra %
+00000253 : 00012403;   % 737: 			lw 	s0, 0(sp)		# recupera s0 original %
+00000254 : 00810113;   % 738:     			addi    sp, sp, 8		# libera espaco %
+00000255 : 00008067;   % 739: fimprintString:	ret      	    			# retorna %
+00000256 : 0ff00e93;   % 761: printChar:	li 	t4, 0xFF	# t4 temporario %
+00000257 : 008e9e93;   % 762: 		slli 	t4, t4, 8	# t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00") %
+00000258 : 01d6ff33;   % 763: 		and    	t5, a3, t4   	# t5 obtem cor de fundo %
+00000259 : 008f5f13;   % 764:     		srli	t5, t5, 8	# numero da cor de fundo %
+0000025a : 0ff6ff93;   % 765: 		andi   	t6, a3, 0xFF    # t6 obtem cor de frente %
+0000025b : 02000213;   % 767: 		li 	tp, ' ' %
+0000025c : 00454863;   % 768: 		blt 	a0, tp, NAOIMPRIMIVEL	# ascii menor que 32 nao eh imprimivel %
+0000025d : 07e00213;   % 769: 		li 	tp, '~' %
+0000025e : 00a24463;   % 770: 		bgt	a0, tp, NAOIMPRIMIVEL	# ascii Maior que 126  nao eh imprimivel %
+0000025f : 0080006f;   % 771:     		j       IMPRIMIVEL %
+00000260 : 02000513;   % 773: NAOIMPRIMIVEL:	li      a0, 32		# Imprime espaco %
+00000261 : 14000213;   % 775: IMPRIMIVEL:	li	tp, 320		# Num colunas 320 %
+00000262 : 02c20eb3;   % 776: 		mul     t4, tp, a2			# multiplica a2x320  t4 = coordenada y %
+00000263 : 00be8eb3;   % 777: 		add     t4, t4, a1               	# t4 = 320*y + x %
+00000264 : 007e8e93;   % 778: 		addi    t4, t4, 7                 	# t4 = 320*y + (x+7) %
+00000265 : ff000237;   % 779: 		li      tp, 0xFF000000          	# Endereco de inicio da memoria VGA0 %
+00000266 : 00020213;   % 779:  %
+00000267 : 00070663;   % 780: 		beq 	a4, zero, PULAFRAME		# Verifica qual o frame a ser usado em a4 %
+00000268 : ff100237;   % 781: 		li      tp, 0xFF100000          	# Endereco de inicio da memoria VGA1 %
+00000269 : 00020213;   % 781:  %
+0000026a : 004e8eb3;   % 782: PULAFRAME:	add     t4, t4, tp               	# t4 = endereco de impressao do ultimo pixel da primeira linha do char %
+0000026b : fe050393;   % 783: 		addi    t2, a0, -32               	# indice do char na memoria %
+0000026c : 00339393;   % 784: 		slli    t2, t2, 3                 	# offset em bytes em relacao ao endereco inicial %
+0000026d : 0fc14e17;   % 785: 		la      t3, LabelTabChar		# endereco dos caracteres na memoria %
+0000026e : 440e0e13;   % 785:  %
+0000026f : 01c383b3;   % 786: 		add     t2, t2, t3               	# endereco do caractere na memoria %
+00000270 : 0003ae03;   % 787: 		lw      t3, 0(t2)                 	# carrega a primeira word do char %
+00000271 : 00400293;   % 788: 		li 	t0, 4				# i=4 %
+00000272 : 02028e63;   % 790: forChar1I:	beq     t0, zero, endForChar1I		# if(i == 0) end for i %
+00000273 : 00800313;   % 791:     		addi    t1, zero, 8               	# j = 8 %
+00000274 : 02030463;   % 793: 	forChar1J:      beq     t1, zero, endForChar1J    	# if(j == 0) end for j %
+00000275 : 001e7c93;   % 794:         		andi    s9, t3, 0x001			# primeiro bit do caracter %
+00000276 : 001e5e13;   % 795:         		srli    t3, t3, 1             		# retira o primeiro bit %
+00000277 : 000c8663;   % 796:         		beq     s9, zero, printCharPixelbg1	# pixel eh fundo? %
+00000278 : 01fe8023;   % 797:         		sb      t6, 0(t4)             		# imprime pixel com cor de frente %
+00000279 : 0080006f;   % 798:         		j       endCharPixel1 %
+0000027a : 01ee8023;   % 799: printCharPixelbg1:     	sb      t5, 0(t4)                 	# imprime pixel com cor de fundo %
+0000027b : fff30313;   % 800: endCharPixel1:     	addi    t1, t1, -1                	# j-- %
+0000027c : fffe8e93;   % 801:     			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda %
+0000027d : fddff06f;   % 802:     			j       forChar1J			# vollta novo pixel %
+0000027e : fff28293;   % 804: endForChar1J: 	addi    t0, t0, -1 		# i-- %
+0000027f : 148e8e93;   % 805:     		addi    t4, t4, 328           	# 2**12 + 8 %
+00000280 : fc9ff06f;   % 806:     		j       forChar1I		# volta ao loop %
+00000281 : 0043ae03;   % 808: endForChar1I:	lw      t3, 4(t2)           	# carrega a segunda word do char %
+00000282 : 00400293;   % 809: 		li 	t0, 4			# i = 4 %
+00000283 : 02028e63;   % 810: forChar2I:     	beq     t0, zero, endForChar2I  # if(i == 0) end for i %
+00000284 : 00800313;   % 811:     		addi    t1, zero, 8             # j = 8 %
+00000285 : 02030463;   % 813: 	forChar2J:	beq	t1, zero, endForChar2J    	# if(j == 0) end for j %
+00000286 : 001e7c93;   % 814:         		andi    s9, t3, 0x001	    		# pixel a ser impresso %
+00000287 : 001e5e13;   % 815:         		srli    t3, t3, 1                 	# desloca para o proximo %
+00000288 : 000c8663;   % 816:         		beq     s9, zero, printCharPixelbg2	# pixel eh fundo? %
+00000289 : 01fe8023;   % 817:         		sb      t6, 0(t4)			# imprime cor frente %
+0000028a : 0080006f;   % 818:         		j       endCharPixel2			# volta ao loop %
+0000028b : 01ee8023;   % 820: printCharPixelbg2:     	sb      t5, 0(t4)			# imprime cor de fundo %
+0000028c : fff30313;   % 822: endCharPixel2:     	addi    t1, t1, -1			# j-- %
+0000028d : fffe8e93;   % 823:     			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda %
+0000028e : fddff06f;   % 824:     			j       forChar2J %
+0000028f : fff28293;   % 826: endForChar2J:	addi	t0, t0, -1 		# i-- %
+00000290 : 148e8e93;   % 827:     		addi    t4, t4, 328		# %
+00000291 : fc9ff06f;   % 828:     		j       forChar2I		# volta ao loop %
+00000292 : 00008067;   % 830: endForChar2I:	ret				# retorna %
+00000293 : 00000013;   % 839: readChar: 		nop %
+00000294 : ff2002b7;   % 843: readCharKDMMIO:		li 	t0, 0xFF200000			# Execucao com Polling do KD MMIO %
+00000295 : 00028293;   % 843:  %
+00000296 : 0002a503;   % 845: loopReadCharKDMMIO:  	lw     	a0, 0(t0)   			# le o bit de flag do teclado %
+00000297 : 00157513;   % 846: 			andi 	a0, a0, 0x0001			# mascara bit 0 %
+00000298 : fe050ce3;   % 847: 			beq     a0, zero, loopReadCharKDMMIO  	# testa se uma tecla foi pressionada %
+00000299 : 0042a503;   % 848:    			lw 	a0, 4(t0)			# le o ascii da tecla pressionada %
+0000029a : 0800006f;   % 849: 			j fimreadChar				# fim Read Char %
+0000029b : ff2002b7;   % 866: readCharDE2:  	li      t0, 0xFF200100 			# Endereco buffer0 %
+0000029c : 10028293;   % 866:  %
+0000029d : 0002a303;   % 867:     		lw     	t1, 0(t0)				# conteudo inicial do buffer %
+0000029e : 0002a383;   % 869: loopReadChar:  	lw     	t2, 0(t0)   				# le buffer teclado %
+0000029f : 00639663;   % 870: 		bne     t2, t1, buffermodificadoChar    	# testa se o buffer foi modificado %
+000002a0 : 00700333;   % 872: atualizaBufferChar:  mv t1, t2			# atualiza o buffer com o novo valor %
+000002a1 : ff5ff06f;   % 873:     		j       loopReadChar		# loop de principal de leitura  %
+000002a2 : 0ff00f13;   % 875: buffermodificadoChar:	li t5, 0xFF %
+000002a3 : 008f1f13;   % 876: 	slli 	t5, t5, 8			# t5 = 0x0000FF00 %
+000002a4 : 01e3fe33;   % 877: 	and    	t3, t2, t5 			# mascara o 2o scancode %
+000002a5 : 0000f237;   % 878: 	li 	tp, 0x0000F000 %
+000002a6 : 00020213;   % 878:  %
+000002a7 : 024e0063;   % 879: 	beq     t3, tp, teclasoltaChar		# eh 0xF0 no 2o scancode? tecla foi solta %
+000002a8 : 0ff00213;   % 880: 	li	tp, 0x000000FF %
+000002a9 : 0043fe33;   % 881: 	and	t3, t2, tp			# mascara 1o scancode	(essa podemos fazer diretamente) %
+000002aa : 01200213;   % 882: 	li	tp, 0x00000012 %
+000002ab : fc4e1ae3;   % 883:     	bne 	t3, tp, atualizaBufferChar	# nao eh o SHIFT que esta pressionado ? volta a ler  %
+000002ac : 0fc14417;   % 884: 	la      s0, LabelScanCodeShift		# se for SHIFT que esta pressionado atualiza o endereco da tabel %
+000002ad : 6e240413;   % 884:  %
+000002ae : fc9ff06f;   % 885:     	j       atualizaBufferChar		# volta a ler %
+000002af : 0ff3fe13;   % 887: teclasoltaChar:		andi t3, t2, 0x00FF		# mascara o 1o scancode %
+000002b0 : 08000213;   % 888: 	li	tp, 0x00000080 %
+000002b1 : fbc24ee3;   % 889:   	bgt	t3, tp, atualizaBufferChar		# se o scancode for > 0x80 entao nao eh imprimivel! %
+000002b2 : 01200213;   % 890:   	li	tp, 0x00000012 %
+000002b3 : 004e1863;   % 891: 	bne 	t3, tp, naoehshiftChar			# nao foi o shift que foi solto? entao processa %
+000002b4 : 0fc14417;   % 892: 	la 	s0, LabelScanCode			# shift foi solto atualiza o endereco da tabela %
+000002b5 : 63c40413;   % 892:  %
+000002b6 : fa9ff06f;   % 893: 	j 	atualizaBufferChar			# volta a ler %
+000002b7 : 01c40e33;   % 895: naoehshiftChar:	   	add     t3, s0, t3              # endereco na tabela de scancode da tecla com ou sem shift %
+000002b8 : 000e0503;   % 896:     	lb      a0, 0(t3)				# le o ascii do caracter para a0 %
+000002b9 : f8050ee3;   % 897:     	beq     a0, zero, atualizaBufferChar		# se for caractere nao imprimivel volta a ler %
+000002ba : 00008067;   % 899: fimreadChar: 	ret			# retorna %
+000002bb : ff810113;   % 911: readString: 	addi 	sp, sp, -8			# reserva espaco na pilha %
+000002bc : 00812223;   % 912: 		sw 	s0, 4(sp)			# salva s0 %
+000002bd : 00112023;   % 913: 		sw 	ra, 0(sp)			# salva ra %
+000002be : 00000693;   % 914: 		li 	a3, 0				# zera o contador de caracteres digitados %
+000002bf : 00a00933;   % 915: 		mv 	s2, a0				# salva o endereco inicial %
+000002c0 : 0fc14417;   % 916:     		la      s0, LabelScanCode      		# Endereco da tabela de scancode inicial para readChar %
+000002c1 : 60c40413;   % 916:  %
+000002c2 : 04d58c63;   % 918: loopreadString: beq 	a1, a3, fimreadString   	# buffer cheio fim %
+000002c3 : ff810113;   % 920: 		addi 	sp, sp, -8 %
+000002c4 : 00112023;   % 921: 		sw 	ra, 0(sp)			# salva ra %
+000002c5 : 00a12223;   % 922: 		sw 	a0, 4(sp)			# salva a0 pois ele sera reescrito em readChar %
+000002c6 : f35ff0ef;   % 923: 		jal 	readChar			# le um caracter do teclado (retorno em a0) %
+000002c7 : 00a00fb3;   % 924: 		mv 	t6, a0				# t6 eh a letra lida em readChar %
+000002c8 : 00012083;   % 925: 		lw 	ra, 0(sp) %
+000002c9 : 00412503;   % 926: 		lw 	a0, 4(sp) %
+000002ca : 00810113;   % 927: 		addi 	sp, sp, 8 %
+000002cb : 00800213;   % 929: 		li 	tp, 0x08			 %
+000002cc : 004f9c63;   % 930: 		bne	t6, tp, PulaBackSpace		# Se nao for BACKSPACE %
+000002cd : fcd00ae3;   % 931: 		beq	zero, a3, loopreadString	# Se não tem nenhum caractere no buffer apenas volta a ler %
+000002ce : fff68693;   % 932: 		addi	a3, a3, -1			# diminui contador %
+000002cf : fff50513;   % 933: 		addi 	a0, a0, -1			# diminui endereco do buffer %
+000002d0 : 00050023;   % 934: 		sb 	zero, 0(a0)			# coloca zero no caractere anterior %
+000002d1 : fc5ff06f;   % 935: 		j loopreadString %
+000002d2 : 00a00213;   % 937: PulaBackSpace:	li	tp, 0x0A %
+000002d3 : 004f8a63;   % 938: 		beq 	t6, tp, fimreadString		# se for tecla ENTER fim %
+000002d4 : 01f50023;   % 939: 		sb 	t6, 0(a0)			# grava no buffer %
+000002d5 : 00168693;   % 940: 		addi 	a3, a3, 1			# incrementa contador %
+000002d6 : 00150513;   % 941: 		addi 	a0, a0, 1			# incrementa endereco no buffer %
+000002d7 : fadff06f;   % 942: 		j loopreadString			# volta a ler outro caractere %
+000002d8 : 00050023;   % 944: fimreadString: 	sb 	zero, 0(a0)			# grava NULL no buffer %
+000002d9 : fff50613;   % 945: 		addi 	a2, a0, -1			# Para que a2 tenha o endereco do ultimo caractere digitado %
+000002da : 01200533;   % 946: 		mv	a0, s2				# a0 volta a ter o endereco inicial da string %
+000002db : 00012083;   % 947: 		lw 	ra, 0(sp)			# recupera ra %
+000002dc : 00412403;   % 948: 		lw	s0, 4(sp)			# recupera s0 %
+000002dd : 00810113;   % 949: 		addi 	sp, sp, 8			# libera espaco %
+000002de : 00008067;   % 950: 		ret					# retorna %
+000002df : ffc10113;   % 959: readInt: 	addi 	sp,sp,-4		# reserva espaco na pilha %
+000002e0 : 00112023;   % 960: 	sw 	ra, 0(sp)			# salva ra %
+000002e1 : 0fc14517;   % 961: 	la 	a0, TempBuffer			# Endereco do buffer de string %
+000002e2 : 69450513;   % 961:  %
+000002e3 : 00a00593;   % 962: 	li 	a1, 10				# numero maximo de digitos %
+000002e4 : f5dff0ef;   % 963: 	jal 	readString			# le uma string de ate 10 digitos, a3 numero de digitos %
+000002e5 : 00c002b3;   % 964: 	mv 	t0, a2				# copia endereco do ultimo digito %
+000002e6 : 00a00393;   % 965: 	li 	t2, 10				# dez %
+000002e7 : 00100e13;   % 966: 	li 	t3, 1				# dezenas, centenas, etc %
+000002e8 : 00000533;   % 967: 	mv 	a0, zero			# zera o numero %
+000002e9 : 04068663;   % 969: loopReadInt: 	beq	a3,zero, fimReadInt	# Leu todos os digitos %
+000002ea : 00028303;   % 970: 	lb 	t1, (t0)			# le um digito %
+000002eb : 02d00213;   % 971: 	li	tp, 0x0000002D %
+000002ec : 02430e63;   % 972: 	beq 	t1, tp, ehnegReadInt		# = '-' %
+000002ed : 02b00213;   % 973: 	li	tp, 0x0000002B %
+000002ee : 02430c63;   % 974: 	beq 	t1, tp, ehposReadInt		# = '+' %
+000002ef : 03000213;   % 975: 	li	tp, 0x00000030 %
+000002f0 : 02434463;   % 976: 	blt 	t1, tp, naoehReadInt		# <'0' %
+000002f1 : 03900213;   % 977: 	li	tp, 0x00000039 %
+000002f2 : 02624063;   % 978: 	bgt 	t1, tp, naoehReadInt		# >'9' %
+000002f3 : fd030313;   % 979: 	addi 	t1, t1, -48			# transforma ascii em numero %
+000002f4 : 03c30333;   % 980: 	mul 	t1, t1, t3			# multiplica por dezenas/centenas %
+000002f5 : 00650533;   % 981: 	add 	a0, a0, t1			# soma no numero %
+000002f6 : 027e0e33;   % 982: 	mul 	t3, t3, t2			# proxima dezena/centena %
+000002f7 : fff28293;   % 983: 	addi 	t0, t0, -1			# busca o digito anterior %
+000002f8 : fff68693;   % 984: 	addi	a3, a3, -1			# reduz o contador de digitos  %
+000002f9 : fc1ff06f;   % 985: 	j 	loopReadInt			# volta para buscar proximo digito %
+000002fa : 0080006f;   % 988: 		j fimReadInt			# como nao esta implmentado apenas retorna %
+000002fb : 40a00533;   % 990: ehnegReadInt:	sub a0,zero,a0			# se for negativo %
+000002fc : 00012083;   % 994: fimReadInt:	lw 	ra, 0(sp)		# recupera ra %
+000002fd : 00410113;   % 995: 		addi 	sp, sp, 4		# libera espaco %
+000002fe : 00008067;   % 996: 		ret				# fim ReadInt %
+000002ff : 10008237;   % 1016: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+00000300 : 00020213;   % 1016:  %
+00000301 : 00419863;   % 1016: <14> bne gp,tp,midiOutDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+00000302 : 01f00893;   % 1018: 	li a7,31		# Chama o ecall normal %
+00000303 : 00000073;   % 1019: 	ecall %
+00000304 : 0600006f;   % 1020: 	j fimmidiOut %
+00000305 : ff2002b7;   % 1022: midiOutDE2:	li      t0, 0xFF200178 %
+00000306 : 17828293;   % 1022:  %
+00000307 : 00000333;   % 1023:     		add     t1, zero, zero %
+00000308 : 00f67393;   % 1028:    	 	andi    t2, a2, 0x0000000F %
+00000309 : 01b39393;   % 1029:     		slli    t2, t2, 27 %
+0000030a : 00736333;   % 1030:     		or      t1, t1, t2 %
+0000030b : 07f6f393;   % 1033:     		andi    t2, a3, 0x0000007F %
+0000030c : 01439393;   % 1034:     		slli    t2, t2, 20 %
+0000030d : 00736333;   % 1035:     		or      t1, t1, t2 %
+0000030e : 07f57393;   % 1038:     		andi    t2, a0, 0x0000007F %
+0000030f : 00d39393;   % 1039:     		slli    t2, t2, 13 %
+00000310 : 00736333;   % 1040:     		or      t1, t1, t2 %
+00000311 : 1ff00e93;   % 1043: 		li 	t4, 0x1FF %
+00000312 : 004e9e93;   % 1044: 		slli 	t4, t4, 4 %
+00000313 : 00fe8e93;   % 1045: 		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF %
+00000314 : 01d5f3b3;   % 1046:     		and    	t2, a1, t4 %
+00000315 : 00736333;   % 1047:     		or      t1, t1, t2 %
+00000316 : 0040006f;   % 1050:     		j       SintMidOut %
+00000317 : 0062a023;   % 1052: SintMidOut:	sw	t1, 0(t0) %
+00000318 : ff2003b7;   % 1055: 	    		li      t2, 0xFF20017C %
+00000319 : 17c38393;   % 1055:  %
+0000031a : 0003ae03;   % 1056: Check_AUD_DACLRCK:     	lw      t3, 0(t2) %
+0000031b : fe0e0ee3;   % 1057:     			beq     t3, zero, Check_AUD_DACLRCK %
+0000031c : 00008067;   % 1059: fimmidiOut:    		ret %
+0000031d : 10008237;   % 1077: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+0000031e : 00020213;   % 1077:  %
+0000031f : 00419863;   % 1077: <14> bne gp,tp,midiOutSyncDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+00000320 : 02100893;   % 1079: 	li a7,33		# Chama o ecall normal %
+00000321 : 00000073;   % 1080: 	ecall %
+00000322 : 0780006f;   % 1081: 	j fimmidiOutSync %
+00000323 : ff2002b7;   % 1083: midiOutSyncDE2:	li      t0, 0xFF200178 %
+00000324 : 17828293;   % 1083:  %
+00000325 : 00000333;   % 1084:     		add     t1, zero, zero %
+00000326 : 08000337;   % 1087:     		lui    	t1, 0x08000 %
+00000327 : 00431313;   % 1088: 		slli	t1,t1,4 %
+00000328 : 00f67393;   % 1091:     		andi    t2, a2, 0x00F %
+00000329 : 01b39393;   % 1092:     		slli    t2, t2, 27 %
+0000032a : 00736333;   % 1093:     		or      t1, t1, t2 %
+0000032b : 07f6f393;   % 1096:     		andi    t2, a3, 0x07F %
+0000032c : 01439393;   % 1097:     		slli    t2, t2, 20 %
+0000032d : 00736333;   % 1098:     		or      t1, t1, t2 %
+0000032e : 07f57393;   % 1101:     		andi    t2, a0, 0x07F %
+0000032f : 00d39393;   % 1102:     		slli    t2, t2, 13 %
+00000330 : 00736333;   % 1103:     		or      t1, t1, t2 %
+00000331 : 1ff00e93;   % 1106: 		li 	t4, 0x1FF %
+00000332 : 004e9e93;   % 1107: 		slli 	t4, t4, 4 %
+00000333 : 00fe8e93;   % 1108: 		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF %
+00000334 : 01d5f3b3;   % 1109:     		and    	t2, a1, t4 %
+00000335 : 00736333;   % 1110:     		or      t1, t1, t2 %
+00000336 : 0040006f;   % 1113:     		j       SintMidOutSync %
+00000337 : 0062a023;   % 1115: SintMidOutSync:	sw	t1, 0(t0) %
+00000338 : ff2003b7;   % 1118:     		li      t2, 0xFF20017C %
+00000339 : 17c38393;   % 1118:  %
+0000033a : ff200eb7;   % 1119:     		li      t4, 0xFF200180 %
+0000033b : 180e8e93;   % 1119:  %
+0000033c : 0003ae03;   % 1121: Check_AUD_DACLRCKSync:	lw      t3, 0(t2) %
+0000033d : fe0e0ee3;   % 1122:     			beq     t3, zero, Check_AUD_DACLRCKSync %
+0000033e : 000eaf03;   % 1124: Melody:     	lw      t5, 0(t4) %
+0000033f : fe0f1ee3;   % 1125:     		bne     t5, zero, Melody %
+00000340 : 00008067;   % 1127: fimmidiOutSync:	ret %
+00000341 : ffc10113;   % 1137: printFloat:	addi 	sp, sp, -4 %
+00000342 : 00112023;   % 1138: 		sw 	ra, 0(sp)				# salva ra %
+00000343 : 0fc14417;   % 1139: 		la 	s0, TempBuffer %
+00000344 : 50c40413;   % 1139:  %
+00000345 : 02b00293;   % 1142: 		li 	t0, '+'			# define sinal '+' %
+00000346 : e00504d3;   % 1143: 		fmv.x.s s1, fa0			# recupera o numero float sem conversao %
+00000347 : 080003b7;   % 1144: 		lui	t2, 0x08000 %
+00000348 : 00439393;   % 1145: 		slli	t2,t2,4 %
+00000349 : 0074f4b3;   % 1146: 		and 	s1, s1, t2			# mascara com 1000...0 %
+0000034a : 00048663;   % 1147: 		beq 	s1, zero, ehposprintFloat	# eh positivo s1=0 %
+0000034b : 00100493;   % 1148: 		li 	s1, 1				# numero eh negativo s1=1 %
+0000034c : 02d00293;   % 1149: 		li 	t0, '-'				# define sinal '-' %
+0000034d : 00540023;   % 1150: ehposprintFloat: sb 	t0, 0(s0)			# coloca sinal no buffer %
+0000034e : 00140413;   % 1151: 		addi 	s0, s0,1			# incrementa o endereco do buffer %
+0000034f : e00502d3;   % 1154: 		 fmv.x.s t0, fa0			# recupera o numero float sem conversao %
+00000350 : 7f800337;   % 1155: 		 lui	t1, 0x7F800 %
+00000351 : 0062f2b3;   % 1156: 		 and 	t0, t0, t1   			# mascara com 0111 1111 1000 0000 0000 0000... %
+00000352 : 00129293;   % 1157: 		 slli 	t0, t0, 1			# tira o sinal do numero %
+00000353 : 0182d293;   % 1158: 		 srli 	t0, t0, 24			# recupera o expoente %
+00000354 : e0050353;   % 1161: 		fmv.x.s t1, fa0				# recupera o numero float sem conversao %
+00000355 : 7ffff3b7;   % 1162: 		lui 	t2, 0x7FFFF %
+00000356 : 0083d393;   % 1163: 		srli	t2, t2, 8 %
+00000357 : 00f38393;   % 1164: 		addi	t2, t2, 0x00F			# t2 = 0x007FFFFF %
+00000358 : 00737333;   % 1165: 		and 	t1, t1, t2			# mascara com 0000 0000 0111 1111 1111... 		  %
+00000359 : 14028863;   % 1167: 		beq 	t0, zero, ehExp0printFloat	# Expoente = 0 %
+0000035a : 0ff00213;   % 1168: 		li	tp, 0x000000FF			# TP = 255 %
+0000035b : 16428863;   % 1169: 		beq 	t0, tp, ehExp255printFloat	# Expoente = 255 %
+0000035c : 20a52053;   % 1173: 		fabs.s 		ft0, fa0		# ft0 recebe o modulo  de x %
+0000035d : 00100213;   % 1174: 		li		tp, 1 %
+0000035e : d00270d3;   % 1175: 		fcvt.s.w 	ft1, tp			# ft1 recebe o numero 1.0 %
+0000035f : 00a00213;   % 1176: 		li		tp, 10 %
+00000360 : d0027353;   % 1177: 		fcvt.s.w 	ft6, tp			# ft6 recebe o numero 10.0 %
+00000361 : 00200213;   % 1178: 		li		tp, 2 %
+00000362 : d0027e53;   % 1179: 		fcvt.s.w 	ft8, tp %
+00000363 : 19c0f3d3;   % 1180: 		fdiv.s		ft7, ft1, ft8		# ft7 recebe o numero 0.5 %
+00000364 : a0101ed3;   % 1182: 		flt.s 	t4, ft0, ft1		# ft0 < 1.0 ? Se sim, E deve ser negativo %
+00000365 : 000e9663;   % 1183: 		bnez	t4, menor1printFloat	# se a comparacao deu true (1), pula %
+00000366 : 20630153;   % 1184: 		fmv.s 	ft2, ft6		# ft2  fator de multiplicacao = 10 %
+00000367 : 02c0006f;   % 1185: 		j 	cont2printFloat		# vai para expoente positivo %
+00000368 : 1860f153;   % 1186: menor1printFloat: fdiv.s ft2,ft1,ft6		# ft2 fator multiplicativo = 0.1 %
+00000369 : 20000253;   % 1189: cont1printFloat: 	fmv.s 	ft4, ft0			# inicia com o numero x  %
+0000036a : 201081d3;   % 1190: 		 	fmv.s 	ft3, ft1			# contador comeca em 1 %
+0000036b : 18227253;   % 1191: loop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# divide o numero pelo fator multiplicativo %
+0000036c : a0120e53;   % 1192: 		 	fle.s 	t3, ft4, ft1			# o numero eh > que 1? entao fim %
+0000036d : 000e0663;   % 1193: 		 	beq 	t3,zero, fimloop1printFloat %
+0000036e : 0011f1d3;   % 1194: 		 	fadd.s 	ft3, ft3, ft1			# incrementa o contador %
+0000036f : ff1ff06f;   % 1195: 		 	j 	loop1printFloat			# volta ao loop %
+00000370 : 18227253;   % 1196: fimloop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# ajusta o numero %
+00000371 : 0200006f;   % 1197: 		 	j 	intprintFloat			# vai para imprimir a parte inteira %
+00000372 : 20000253;   % 1200: cont2printFloat:	fmv.s 	 ft4, ft0			# inicia com o numero x  %
+00000373 : d00071d3;   % 1201: 		 	fcvt.s.w ft3, zero			# contador comeca em 0 %
+00000374 : a0621e53;   % 1202: loop2printFloat:  	flt.s 	 t3, ft4, ft6			# resultado eh < que 10? entao fim %
+00000375 : 18227253;   % 1203: 			fdiv.s 	 ft4, ft4, ft2			# divide o numero pelo fator multiplicativo %
+00000376 : 000e1663;   % 1204: 			bne 	 t3, zero, intprintFloat %
+00000377 : 0011f1d3;   % 1205: 		 	fadd.s 	 ft3, ft3, ft1			# incrementa o contador %
+00000378 : ff1ff06f;   % 1206: 		 	j 	 loop2printFloat %
+00000379 : 10227253;   % 1212: intprintFloat:		fmul.s 		ft4, ft4, ft2		# ajusta o numero %
+0000037a : 08727253;   % 1213: 			fsub.s		ft4, ft4, ft7		# tira 0.5, dessa forma sempre ao converter estaremos fazendo floor %
+0000037b : c00272d3;   % 1214: 		  	fcvt.w.s	t0, ft4			# coloca floor de ft4 em t0 %
+0000037c : 00727253;   % 1215: 			fadd.s		ft4, ft4, ft7		# readiciona 0.5 %
+0000037d : 03028293;   % 1216: 			addi 		t0, t0, 48		# converte para ascii			 %
+0000037e : 00540023;   % 1217: 			sb 		t0, 0(s0)		# coloca no buffer %
+0000037f : 00140413;   % 1218: 		  	addi 		s0, s0, 1		# incrementta o buffer %
+00000380 : 02e00293;   % 1221: 		  	li 	t0, '.'				# carrega o '.' %
+00000381 : 00540023;   % 1222: 		  	sb 	t0, 0(s0)			# coloca no buffer %
+00000382 : 00140413;   % 1223: 		  	addi 	s0, s0, 1			# incrementa o buffer %
+00000383 : 00800313;   % 1226: 		  	li 		t1, 8				# contador de digitos  -  8 casas decimais %
+00000384 : 04030a63;   % 1227: loopfracprintFloat:  	beq 		t1, zero, fimfracprintFloat	# fim dos digitos? %
+00000385 : 08727253;   % 1228: 			fsub.s		ft4, ft4, ft7			# tira 0.5 %
+00000386 : c0027f53;   % 1229: 			fcvt.w.s 	t5, ft4				# floor de ft4 %
+00000387 : 00727253;   % 1230: 			fadd.s		ft4, ft4, ft7			# readiciona 0.5 %
+00000388 : d00f72d3;   % 1231: 			fcvt.s.w	ft5, t5				# reconverte em float so com a parte inteira %
+00000389 : 085272d3;   % 1232: 		  	fsub.s 		ft5, ft4, ft5			# parte fracionaria %
+0000038a : 1062f2d3;   % 1233: 		  	fmul.s 		ft5, ft5, ft6			# mult x 10 %
+0000038b : 0872f2d3;   % 1234: 			fsub.s		ft5, ft5, ft7			# tira 0.5 %
+0000038c : c002f2d3;   % 1235: 			fcvt.w.s	t0, ft5				# coloca floor de ft5 em 10 %
+0000038d : 03028293;   % 1236: 		  	addi 		t0, t0, 48			# converte para ascii %
+0000038e : 03000213;   % 1238: 			li 		tp, 48 %
+0000038f : 0042c663;   % 1239: 			blt		t0, tp, pulaprtFloat1	# testa se eh menor que '0' %
+00000390 : 03900213;   % 1240: 			li		tp, 57 %
+00000391 : 00525463;   % 1241: 			ble		t0, tp, pulaprtFloat2	# testa se eh menor ou igual que '9' %
+00000392 : 03000293;   % 1242: pulaprtFloat1:		li		t0, 48			# define como '0'		  			  	 %
+00000393 : 00540023;   % 1244: pulaprtFloat2:	  	sb 		t0, 0(s0)			# coloca no buffer %
+00000394 : 00140413;   % 1245: 		  	addi 		s0, s0, 1			# incrementa endereco %
+00000395 : fff30313;   % 1246: 		  	addi 		t1, t1, -1			# decrementa contador %
+00000396 : 0072f2d3;   % 1247: 			fadd.s		ft5, ft5, ft7			# reincrementa 0.5 %
+00000397 : 20528253;   % 1248: 		  	fmv.s 		ft4, ft5			# coloca o numero em ft4 %
+00000398 : fb1ff06f;   % 1249: 		  	j 		loopfracprintFloat		# volta ao loop %
+00000399 : 04500293;   % 1252: fimfracprintFloat: 	li 	t0,'E'			# carrega 'E' %
+0000039a : 00540023;   % 1253: 			sb 	t0, 0(s0)		# coloca no buffer %
+0000039b : 00140413;   % 1254: 			addi 	s0, s0, 1		# incrementa endereco %
+0000039c : 02b00293;   % 1257: 		  	li 	t0, '+'				# carrega '+' %
+0000039d : 000e8463;   % 1258: 		  	beqz 	t4, expposprintFloat		# nao eh negativo? %
+0000039e : 02d00293;   % 1259: 		  	li 	t0, '-'				# carrega '-' %
+0000039f : 00540023;   % 1260: expposprintFloat: 	sb 	t0, 0(s0)			# coloca no buffer %
+000003a0 : 00140413;   % 1261: 		  	addi 	s0, s0, 1			#incrementa endereco %
+000003a1 : 00a00313;   % 1264: 			li 	t1, 10				# carrega 10	 %
+000003a2 : c001f253;   % 1265: 			fcvt.w.s  tp, ft3			# passa ft3 para t0 %
+000003a3 : 026242b3;   % 1266: 			div 	t0, tp, t1			# divide por 10 (dezena) %
+000003a4 : 026263b3;   % 1267: 			rem	t2, tp, t1			# t0 = quociente, t2 = resto %
+000003a5 : 03028293;   % 1268: 			addi 	t0, t0, 48			# converte para ascii %
+000003a6 : 00540023;   % 1269: 			sb 	t0, 0(s0)			# coloca no buffer %
+000003a7 : 03038393;   % 1270: 			addi 	t2, t2, 48			# converte para ascii %
+000003a8 : 007400a3;   % 1271: 			sb 	t2, 1(s0)			# coloca no buffer %
+000003a9 : 00040123;   % 1272: 			sb 	zero, 2(s0)			# insere \NULL da string %
+000003aa : 0fc14517;   % 1273: 			la 	a0, TempBuffer			# endereco do Buffer										 %
+000003ab : 37050513;   % 1273:  %
+000003ac : 0500006f;   % 1274: 	  		j 	fimprintFloat			# imprime a string %
+000003ad : 00030e63;   % 1276: ehExp0printFloat: 	beq 	t1, zero, eh0printFloat		# Verifica se eh zero %
+000003ae : 0fc14517;   % 1278: ehDesnormprintFloat: 	la 	a0, NumDesnormP			# string numero desnormalizado positivo %
+000003af : 57350513;   % 1278:  %
+000003b0 : 04048063;   % 1279: 			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo %
+000003b1 : 0fc14517;   % 1280: 		 	la 	a0, NumDesnormN			# string numero desnormalizado negativo %
+000003b2 : 57050513;   % 1280:  %
+000003b3 : 0340006f;   % 1281: 			j 	fimprintFloat			# imprime a string %
+000003b4 : 0fc14517;   % 1283: eh0printFloat:		la 	a0, NumZero			# string do zero %
+000003b5 : 56d50513;   % 1283:  %
+000003b6 : 0280006f;   % 1284: 			j 	fimprintFloat 	 		# imprime a string %
+000003b7 : 00030863;   % 1286: ehExp255printFloat: 	beq 	t1, zero, ehInfprintFloat	# se mantissa eh zero entao eh Infinito %
+000003b8 : 0fc14517;   % 1288: ehNaNprintfFloat:	la 	a0, NumNaN			# string do NaN %
+000003b9 : 57c50513;   % 1288:  %
+000003ba : 0180006f;   % 1289: 			j 	fimprintFloat			# imprime string %
+000003bb : 0fc14517;   % 1291: ehInfprintFloat:	la 	a0, NumInfP			# string do infinito positivo %
+000003bc : 55c50513;   % 1291:  %
+000003bd : 00048663;   % 1292: 			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo %
+000003be : 0fc14517;   % 1293: 			la 	a0, NumInfN			# string do infinito negativo %
+000003bf : 55a50513;   % 1293:  %
+000003c0 : a11ff0ef;   % 1296: fimprintFloat:		jal 	printString			# imprime a string em a0 %
+000003c1 : 00012083;   % 1297: 			lw 	ra, 0(sp)			# recupera ra %
+000003c2 : 00410113;   % 1298: 			addi 	sp, sp, 4			# libera espaco %
+000003c3 : 00008067;   % 1299: 			ret					# retorna %
+000003c4 : ffc10113;   % 1308: readFloat: addi sp, sp, -4			# aloca espaco %
+000003c5 : 00112023;   % 1309: 	sw 	ra, 0(sp)			# salva ra %
+000003c6 : 0fc14517;   % 1310: 	la 	a0, TempBuffer			# endereco do FloatBuffer %
+000003c7 : 30050513;   % 1310:  %
+000003c8 : 02000593;   % 1311: 	li 	a1, 32				# numero maximo de caracteres %
+000003c9 : bc9ff0ef;   % 1312: 	jal	readString			# le string, retorna a2 ultimo endereco e a3 numero de caracteres %
+000003ca : 00c00433;   % 1313: 	mv 	s0, a2				# ultimo endereco da string (antes do \0) %
+000003cb : 00d004b3;   % 1314: 	mv 	s1, a3				# numero de caracteres digitados %
+000003cc : 0fc14b97;   % 1315: 	la	s7, TempBuffer			# Endereco do primeiro caractere %
+000003cd : 2e8b8b93;   % 1315:  %
+000003ce : 017002b3;   % 1317: lePrimeiroreadFloat:	mv 	t0, s7		# Endereco de Inicio %
+000003cf : 00028303;   % 1318: 	lb 	t1, 0(t0)				# le primeiro caractere %
+000003d0 : 06500213;   % 1319: 	li	tp, 'e'					# TP = 101 = 'e' %
+000003d1 : 02430863;   % 1320: 	beq 	t1, tp, insere0AreadFloat		# insere '0' antes %
+000003d2 : 04500213;   % 1321: 	li 	tp, 'E'					# TP = 69 = 'E' %
+000003d3 : 02430463;   % 1322: 	beq 	t1, tp, insere0AreadFloat		# insere '0' antes %
+000003d4 : 02e00213;   % 1323: 	li	tp, '.'					# TP = 46 = '.' %
+000003d5 : 02430063;   % 1324: 	beq 	t1, tp, insere0AreadFloat		#  insere '0' antes %
+000003d6 : 02b00213;   % 1325: 	li	tp, '+'					# TP = 43 = '+' %
+000003d7 : 00430863;   % 1326: 	beq 	t1, tp, pulaPrimreadChar		# pula o primeiro caractere %
+000003d8 : 02d00213;   % 1327: 	li	tp, '-'					# TP = 45 = '-' %
+000003d9 : 00430463;   % 1328: 	beq 	t1, tp, pulaPrimreadChar %
+000003da : 03c0006f;   % 1329: 	j leUltimoreadFloat %
+000003db : 001b8b93;   % 1331: pulaPrimreadChar: addi s7,s7,1			# incrementa o endereco inicial %
+000003dc : fc9ff06f;   % 1332: 		  j lePrimeiroreadFloat		# volta a testar o novo primeiro caractere %
+000003dd : 008002b3;   % 1334: insere0AreadFloat: mv t0, s0			# endereco do ultimo caractere %
+000003de : 00140413;   % 1335: 		   addi s0, s0, 1		# desloca o ultimo endereco para o proximo %
+000003df : 00148493;   % 1336: 	   	   addi s1, s1, 1		# incrementa o num. caracteres %
+000003e0 : 000400a3;   % 1337: 	   	   sb 	zero, 1(s0)		# \NULL do final de string %
+000003e1 : 01700f33;   % 1338: 	   	   mv t5, s7			# primeiro caractere %
+000003e2 : 01e28a63;   % 1339: insere0Aloop:	   beq 	t0, t5, saiinsere0AreadFloat	# chegou no inicio entao fim %
+000003e3 : 00028303;   % 1340: 		   lb 	t1, 0(t0)		# le caractere %
+000003e4 : 006280a3;   % 1341: 		   sb 	t1, 1(t0)		# escreve no proximo %
+000003e5 : fff28293;   % 1342: 		   addi t0, t0, -1		# decrementa endereco %
+000003e6 : ff1ff06f;   % 1343: 		   j insere0Aloop		# volta ao loop %
+000003e7 : 03000313;   % 1344: saiinsere0AreadFloat: li t1, '0'		# ascii '0' %
+000003e8 : 00628023;   % 1345: 		   sb t1, 0(t0)			# escreve '0' no primeiro caractere %
+000003e9 : 00040303;   % 1347: leUltimoreadFloat: lb  	t1, 0(s0)			# le ultimo caractere %
+000003ea : 06500213;   % 1348: 		li	tp, 'e'				# TP = 101 = 'e' %
+000003eb : 00430c63;   % 1349: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
+000003ec : 04500213;   % 1350: 		li 	tp, 'E'				# TP = 69 = 'E' %
+000003ed : 00430863;   % 1351: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
+000003ee : 02e00213;   % 1352: 		li	tp, '.'				# TP = 46 = '.' %
+000003ef : 00430463;   % 1353: 		beq 	t1, tp, insere0PreadFloat	# insere '0' depois %
+000003f0 : 0180006f;   % 1354: 		j 	inicioreadFloat %
+000003f1 : 00140413;   % 1356: insere0PreadFloat: addi	s0, s0, 1		# desloca o ultimo endereco para o proximo %
+000003f2 : 00148493;   % 1357: 	   	   addi	s1, s1, 1		# incrementa o num. caracteres %
+000003f3 : 03000313;   % 1358: 		   li 	t1,'0'			# ascii '0' %
+000003f4 : 00640023;   % 1359: 		   sb 	t1,0(s0)		# escreve '0' no ultimo %
+000003f5 : 000400a3;   % 1360: 		   sb 	zero,1(s0)		# \null do final de string %
+000003f6 : d0007553;   % 1362: inicioreadFloat:  fcvt.s.w 	fa0, zero	# fa0 Resultado inicialmente zero %
+000003f7 : 00a00293;   % 1363: 		li 	t0, 10			# inteiro 10	 %
+000003f8 : d002f353;   % 1364: 		fcvt.s.w 	ft6, t0		# ft6 contem sempre o numero cte 10.0000 %
+000003f9 : 00100293;   % 1365: 		li 	t0, 1			# inteiro 1 %
+000003fa : d002f0d3;   % 1366: 		fcvt.s.w 	ft1, t0		# ft1 contem sempre o numero cte 1.0000	 %
+000003fb : 00140993;   % 1369: procuraEreadFloat:	addi 	s3, s0, 1			# inicialmente nao tem 'e' ou 'E' na string (fora da string) %
+000003fc : 017002b3;   % 1370: 			mv 	t0, s7				# endereco inicial %
+000003fd : 02828263;   % 1371: loopEreadFloat: 	beq 	t0, s0, naotemEreadFloat	# sai se nao encontrou 'e' %
+000003fe : 00028303;   % 1372: 			lb 	t1, 0(t0)			# le o caractere %
+000003ff : 06500213;   % 1373: 			li	tp, 'e'				# TP = 101 = 'e' %
+00000400 : 00430a63;   % 1374: 			beq 	t1, tp, ehEreadFloat		# tem 'e' %
+00000401 : 04500213;   % 1375: 			li 	tp, 'E'				# TP = 69 = 'E' %
+00000402 : 00430663;   % 1376: 			beq	t1, tp, ehEreadFloat		# tem 'E' %
+00000403 : 00128293;   % 1377: 			addi 	t0, t0, 1			# incrementa endereco %
+00000404 : fe5ff06f;   % 1378: 			j 	loopEreadFloat			# volta ao loop %
+00000405 : 005009b3;   % 1379: ehEreadFloat: 		mv 	s3, t0				# endereco do 'e' ou 'E' na string %
+00000406 : 01300933;   % 1383: procuraPontoreadFloat:	mv 	s2, s3				# local inicial do ponto na string (='e' se existir) ou fora da string	 %
+00000407 : 017002b3;   % 1384: 			mv 	t0, s7				# endereco inicial %
+00000408 : 00828e63;   % 1385: loopPontoreadFloat: 	beq 	t0, s0, naotemPontoreadFloat	# sai se nao encontrou '.' %
+00000409 : 00028303;   % 1386: 			lb 	t1, 0(t0)			# le o caractere %
+0000040a : 02e00213;   % 1387: 			li	tp, '.'				# TP = 46 = '.' %
+0000040b : 00430663;   % 1388: 			beq 	t1, tp, ehPontoreadFloat	# tem '.' %
+0000040c : 00128293;   % 1389: 			addi 	t0, t0, 1			# incrementa endereco %
+0000040d : fedff06f;   % 1390: 			j 	loopPontoreadFloat		# volta ao loop %
+0000040e : 00500933;   % 1391: ehPontoreadFloat: 	mv 	s2, t0				# endereco do '.' na string %
+0000040f : d0007153;   % 1395: intreadFloat:		fcvt.s.w 	ft2, zero		# zera parte inteira %
+00000410 : fff90293;   % 1396: 			addi 	t0, s2, -1			# endereco do caractere antes do ponto %
+00000411 : 201081d3;   % 1397: 			fmv.s 	ft3, ft1			# ft3 contem unidade/dezenas/centenas		 %
+00000412 : 01700f33;   % 1398: 			mv 	t5, s7				# Primeiro Endereco %
+00000413 : 03e2ca63;   % 1399: loopintreadFloat: 	blt 	t0, t5, fimintreadFloat		# sai se o endereco for < inicio da string %
+00000414 : 00028303;   % 1400: 			lb 	t1, 0(t0)			# le o caracter %
+00000415 : 03000213;   % 1401: 			li	tp, '0'				# TP = 48 = '0' %
+00000416 : 10434863;   % 1402: 			blt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero %
+00000417 : 03900213;   % 1403: 			li	tp, '9'				# TP = 57 = '9' %
+00000418 : 10624463;   % 1404: 			bgt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero %
+00000419 : fd030313;   % 1405: 			addi 	t1, t1, -48			# converte ascii para decimal %
+0000041a : d0037153;   % 1406: 			fcvt.s.w  ft2, t1			# digito lido em float %
+0000041b : 10317153;   % 1408: 			fmul.s 	ft2,ft2,ft3			# multiplica por un/dezena/centena %
+0000041c : 00257553;   % 1409: 			fadd.s 	fa0,fa0,ft2			# soma no resultado %
+0000041d : 1061f1d3;   % 1410: 			fmul.s 	ft3,ft3,ft6			# proxima dezena/centena %
+0000041e : fff28293;   % 1412: 			addi 	t0,t0,-1			# endereco anterior %
+0000041f : fd1ff06f;   % 1413: 			j 	loopintreadFloat		# volta ao loop %
+00000420 : d0007153;   % 1417: fracreadFloat:		fcvt.s.w 	ft2, zero		# zera parte fracionaria %
+00000421 : 00190293;   % 1418: 			addi 	t0, s2, 1			# endereco depois do ponto %
+00000422 : 1860f1d3;   % 1419: 			fdiv.s 	ft3, ft1, ft6			# ft3 inicial 0.1 %
+00000423 : 0332da63;   % 1421: loopfracreadFloat: 	bge 	t0, s3, fimfracreadFloat	# endereco eh 'e' 'E' ou >ultimo %
+00000424 : 00028303;   % 1422: 			lb 	t1, 0(t0)			# le o caracter %
+00000425 : 03000213;   % 1423: 			li	tp, '0'				# TP = 48 = '0' %
+00000426 : 0c434863;   % 1424: 			blt 	t1, tp, erroreadFloat		# nao eh valido %
+00000427 : 03900213;   % 1425: 			li	tp, '9'				# TP = 57 = '9' %
+00000428 : 0c624463;   % 1426: 			bgt 	t1, tp, erroreadFloat		# nao eh valido %
+00000429 : fd030313;   % 1427: 			addi 	t1, t1, -48			# converte ascii para decimal %
+0000042a : d0037153;   % 1428: 			fcvt.s.w 	ft2, t1			# digito lido em float		 %
+0000042b : 10317153;   % 1430: 			fmul.s 	ft2, ft2, ft3			# multiplica por ezena/centena %
+0000042c : 00257553;   % 1431: 			fadd.s 	fa0, fa0, ft2			# soma no resultado %
+0000042d : 1861f1d3;   % 1432: 			fdiv.s 	ft3, ft3, ft6			# proxima frac un/dezena/centena %
+0000042e : 00128293;   % 1434: 			addi 	t0, t0, 1			# proximo endereco %
+0000042f : fd1ff06f;   % 1435: 			j 	loopfracreadFloat		# volta ao loop		 %
+00000430 : d0007153;   % 1440: potreadFloat:		fcvt.s.w 	ft2, zero		# zera potencia %
+00000431 : 00198293;   % 1441: 			addi 	t0, s3, 1			# endereco seguinte ao 'e' %
+00000432 : 00000a13;   % 1442: 			li 	s4, 0				# sinal do expoente positivo %
+00000433 : 00028303;   % 1443: 			lb 	t1, 0(t0)			# le o caractere seguinte ao 'e' %
+00000434 : 02d00213;   % 1444: 			li	tp, '-'				# TP = 45 = '-' %
+00000435 : 00430863;   % 1445: 			beq	t1, tp, potsinalnegreadFloat	# sinal do expoente esta escrito e eh positivo %
+00000436 : 02b00213;   % 1446: 			li	tp, '+'				# TP = 43 = '+' %
+00000437 : 00430663;   % 1447: 			beq 	t1, tp, potsinalposreadFloat	# sinal do expoente eh negativo %
+00000438 : 00c0006f;   % 1448: 			j 	pulapotsinalreadFloat		# nao esta escrito o sinal do expoente %
+00000439 : 00100a13;   % 1449: potsinalnegreadFloat:	li 	s4, 1				# s4=1 expoente negativo %
+0000043a : 00128293;   % 1450: potsinalposreadFloat:	addi 	t0, t0, 1			# se tiver '-' ou '+' avanca para o proximo endereco %
+0000043b : 00500ab3;   % 1451: pulapotsinalreadFloat:	mv 	s5, t0 				# Neste ponto s5 contem o endereco do primeiro digito da pot e s4 o sinal do expoente		 %
+0000043c : 201081d3;   % 1453: 			fmv.s 	ft3, ft1			# ft3 un/dez/cen = 1 %
+0000043d : 00000393;   % 1456: expreadFloat:		li 	t2, 0				# zera expoente %
+0000043e : 008002b3;   % 1457: 			mv 	t0, s0				# endereco do ultimo caractere da string %
+0000043f : 00a00e13;   % 1458: 			li 	t3, 10				# numero dez %
+00000440 : 00100e93;   % 1459: 			li 	t4, 1				# und/dez/cent %
+00000441 : 0352c063;   % 1461: loopexpreadFloat:	blt 	t0, s5, fimexpreadFloat		# ainda nao eh o endereco do primeiro digito? %
+00000442 : 00028303;   % 1462: 			lb 	t1, 0(t0)			# le o caracter %
+00000443 : fd030313;   % 1463: 			addi 	t1, t1, -48			# converte ascii para decimal %
+00000444 : 03d30333;   % 1464: 			mul 	t1, t1, t4			# mul digito %
+00000445 : 006383b3;   % 1465: 			add 	t2, t2, t1			# soma ao exp %
+00000446 : 03ce8eb3;   % 1466: 			mul 	t4, t4, t3			# proxima casa decimal %
+00000447 : fff28293;   % 1467: 			addi 	t0, t0, -1			# endereco anterior %
+00000448 : fe5ff06f;   % 1468: 			j loopexpreadFloat			# volta ao loop %
+00000449 : 20108153;   % 1472: 			fmv.s 	ft2, ft1			# numero 10^exp  inicial=1 %
+0000044a : 206301d3;   % 1473: 			fmv.s 	ft3, ft6			# se o sinal for + ft3 eh 10 %
+0000044b : 00000213;   % 1474: 			li	tp, 0x00000000			# TP = ZERO %
+0000044c : 004a0463;   % 1475: 			beq 	s4, tp, sinalexpPosreadFloat	# se sinal exp positivo %
+0000044d : 1860f1d3;   % 1476: 			fdiv.s 	ft3, ft1, ft6			# se o final for - ft3 eh 0.1 %
+0000044e : 00000293;   % 1477: sinalexpPosreadFloat:	li 	t0, 0				# contador  %
+0000044f : 00728863;   % 1478: sinalexpreadFloat: 	beq 	t0, t2, fimsinalexpreadFloat	# se chegou ao fim %
+00000450 : 10317153;   % 1479: 			fmul.s 	ft2, ft2, ft3			# multiplica pelo fator 10 ou 0.1 %
+00000451 : 00128293;   % 1480: 			addi 	t0, t0, 1			# incrementa o contador %
+00000452 : ff5ff06f;   % 1481: 			j 	sinalexpreadFloat %
+00000453 : 10257553;   % 1484: 		fmul.s 	fa0, fa0, ft2		# multiplicacao final! %
+00000454 : 0fc14297;   % 1486: 		la 	t0, TempBuffer		# ajuste final do sinal do numero %
+00000455 : 0c828293;   % 1486:  %
+00000456 : 00028303;   % 1487: 		lb 	t1, 0(t0)		# le primeiro caractere %
+00000457 : 02d00213;   % 1488: 		li	tp, '-'			# TP = 45 = '-' %
+00000458 : 00431463;   % 1489: 		bne 	t1, tp, fimreadFloat	# nao eh '-' entao fim %
+00000459 : 20a51553;   % 1490: 		fneg.s 	fa0, fa0		# nega o numero float %
+0000045a : 00012083;   % 1493: fimreadFloat: 	lw 	ra, 0(sp)		# recupera ra %
+0000045b : 00410113;   % 1494: 		addi 	sp, sp, 4		# libera espaco %
+0000045c : 00008067;   % 1495: 		ret				# retorna %
+0000045d : 10008237;   % 1503: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+0000045e : 00020213;   % 1503:  %
+0000045f : 00419863;   % 1503: <14> bne gp,tp,timeDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+00000460 : 01e00893;   % 1505: 	li 	a7,30				# Chama o ecall do Rars %
+00000461 : 00000073;   % 1506: 	ecall %
+00000462 : 0140006f;   % 1507: 	j 	fimTime				# saida %
+00000463 : ff2002b7;   % 1510: 		li 	t0, 0xFF200510		# carrega endereco do StopWatch %
+00000464 : 51028293;   % 1510:  %
+00000465 : 0002a503;   % 1511: 	 	lw 	a0, 0(t0)		# carrega o valor do contador de ms %
+00000466 : 00000593;   % 1513: 	 	li 	a1, 0x0000		# contador eh de 32 bits %
+00000467 : 00008067;   % 1514: fimTime: 	ret				# retorna %
+00000468 : 10008237;   % 1521: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+00000469 : 00020213;   % 1521:  %
+0000046a : 00419863;   % 1521: <14> bne gp,tp,sleepDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+0000046b : 02000893;   % 1523: 	li 	a7, 32				# Chama o ecall do Rars %
+0000046c : 00000073;   % 1524: 	ecall			 %
+0000046d : 01c0006f;   % 1525: 	j 	fimSleep			# Saida %
+0000046e : ff2002b7;   % 1528: 		li 	t0, 0xFF200510		# endereco StopWatch %
+0000046f : 51028293;   % 1528:  %
+00000470 : 0002a303;   % 1529: 		lw 	t1, 0(t0)		# carrega o contador de ms %
+00000471 : 006503b3;   % 1530: 		add 	t2, a0, t1		# soma com o tempo solicitado pelo usuario %
+00000472 : 0002a303;   % 1532: LoopSleep: 	lw 	t1, 0(t0)		# carrega o contador de ms %
+00000473 : fe734ee3;   % 1533: 		blt 	t1, t2, LoopSleep	# nao chegou ao fim volta ao loop %
+00000474 : 00008067;   % 1535: fimSleep: 	ret				# retorna %
+00000475 : ffc10113;   % 1547: printIntUnsigned:	addi 	sp, sp, -4			# Aloca espaco %
+00000476 : 00112023;   % 1548: 			sw 	ra, 0(sp)			# salva ra %
+00000477 : 0fc14297;   % 1549: 			la 	t0, TempBuffer			# carrega o Endereco do Buffer da String %
+00000478 : 03c28293;   % 1549:  %
+00000479 : 00a00393;   % 1551: 		 	li 	t2, 10				# carrega numero 10 %
+0000047a : 00000313;   % 1552: 			li 	t1, 0				# carrega numero de digitos com 0 %
+0000047b : 02755eb3;   % 1553: loop1printIntUnsigned:	divu 	t4, a0, t2			# divide por 10 (quociente) sem sinal %
+0000047c : 02757e33;   % 1554: 			remu 	t3, a0, t2			# resto sem sinal %
+0000047d : ffc10113;   % 1555: 			addi 	sp, sp, -4			# aloca espaco na pilha %
+0000047e : 01c12023;   % 1556: 			sw 	t3, 0(sp)			# coloca resto na pilha %
+0000047f : 01d00533;   % 1557: 			mv 	a0, t4				# atualiza o numero com o quociente %
+00000480 : 00130313;   % 1558: 			addi 	t1, t1, 1			# incrementa o contador de digitos %
+00000481 : fe0514e3;   % 1559: 			bne 	a0, zero, loop1printIntUnsigned		# verifica se o numero eh zero %
+00000482 : 00012383;   % 1561: loop2printIntUnsigned:	lw 	t2, 0(sp)			# le digito da pilha %
+00000483 : 00410113;   % 1562: 			addi 	sp, sp, 4			# libera espaco %
+00000484 : 03038393;   % 1563: 			addi 	t2, t2, 48			# converte o digito para ascii %
+00000485 : 00728023;   % 1564: 			sb 	t2, 0(t0)			# coloca caractere no buffer %
+00000486 : 00128293;   % 1565: 			addi 	t0, t0, 1			# incrementa endereco do buffer %
+00000487 : fff30313;   % 1566: 			addi 	t1, t1, -1			# decrementa contador de digitos %
+00000488 : fe0314e3;   % 1567: 			bne 	t1, zero, loop2printIntUnsigned	# eh o ultimo? %
+00000489 : 00028023;   % 1568: 			sb 	zero, 0(t0)			# insere \NULL na string %
+0000048a : 0fc14517;   % 1570: 			la 	a0, TempBuffer			# Endereco do buffer da string %
+0000048b : ff050513;   % 1570:  %
+0000048c : ee0ff0ef;   % 1571: 			jal 	printString			# chama o print string %
+0000048d : 00012083;   % 1573: 			lw 	ra, 0(sp)			# recupera a %
+0000048e : 00410113;   % 1574: 			addi 	sp, sp, 4			# libera espaco %
+0000048f : 00008067;   % 1575: fimprintIntUnsigned:	ret					# retorna %
+00000490 : 10008237;   % 1583: <13> li tp, 0x10008000			# carrega tp = 0x10008000 %
+00000491 : 00020213;   % 1583:  %
+00000492 : 00419863;   % 1583: <14> bne gp,tp,randomDE2			# Na DE1 gp = 0 ! Não tem segmento .extern %
+00000493 : 02900893;   % 1585: 	li 	a7,41			# Chama o ecall do Rars %
+00000494 : 00000073;   % 1586: 	ecall	 %
+00000495 : 0100006f;   % 1587: 	j 	fimRandom		# saida %
+00000496 : ff2002b7;   % 1589: randomDE2: 	li 	t0, 0xFF200514	# carrega endereco do LFSR %
+00000497 : 51428293;   % 1589:  %
+00000498 : 0002a503;   % 1590: 		lw 	a0, 0(t0)	# le a word em a0 %
+00000499 : 00008067;   % 1592: fimRandom:	ret			# retorna %
+0000049a : 00058c63;   % 1602: clsCLS:	beq 	a1, zero, frame0CLS %
+0000049b : ff100337;   % 1603: 	li      t1, 0xFF100000              # Memoria VGA 1 %
+0000049c : 00030313;   % 1603:  %
+0000049d : ff1133b7;   % 1604:    	li      t2, 0xFF112C00 %
+0000049e : c0038393;   % 1604:  %
+0000049f : 0140006f;   % 1605:    	j 	pulaCLS %
+000004a0 : ff000337;   % 1606: frame0CLS: li      t1, 0xFF000000           # Memoria VGA 0 %
+000004a1 : 00030313;   % 1606:  %
+000004a2 : ff0133b7;   % 1607:    	   li      t2, 0xFF012C00   	 %
+000004a3 : c0038393;   % 1607:  %
+000004a4 : 0ff57513;   % 1608: pulaCLS: andi    a0, a0, 0x00FF %
+000004a5 : 00a002b3;   % 1611:  	mv 	t0, a0 %
+000004a6 : 00851513;   % 1612:  	slli 	a0, a0, 8 %
+000004a7 : 00a2e2b3;   % 1613:  	or 	t0, t0, a0 %
+000004a8 : 00851513;   % 1614:  	slli 	a0, a0, 8 %
+000004a9 : 00a2e2b3;   % 1615:  	or 	t0, t0, a0 %
+000004aa : 00851513;   % 1616:  	slli 	a0, a0, 8 %
+000004ab : 00a2e2b3;   % 1617:  	or 	t0, t0, a0 %
+000004ac : 00730863;   % 1619: forCLS:	beq     t1, t2, fimCLS %
+000004ad : 00532023;   % 1620: 	sw      t0, 0(t1) %
+000004ae : 00430313;   % 1621:     	addi    t1, t1, 4 %
+000004af : ff5ff06f;   % 1622:     	j       forCLS %
+000004b0 : 00008067;   % 1624: fimCLS:	ret %
+000004b1 : ff000837;   % 1633: BRESENHAM: 	li	a6, 0xFF000000           	# Memoria VGA 0 %
+000004b2 : 00080813;   % 1633:  %
+000004b3 : 00078663;   % 1634: 	   	beq	a5, zero, pulaBRES %
+000004b4 : ff100837;   % 1635: 	   	li 	a6, 0xFF100000              # Memoria VGA 1 %
+000004b5 : 00080813;   % 1635:  %
+000004b6 : 14000893;   % 1637: pulaBRES: 	li 	a7, 320 %
+000004b7 : 40b682b3;   % 1638: 	  	sub 	t0, a3, a1 %
+000004b8 : 0002d463;   % 1639: 	  	bge 	t0, zero, PULAABRES %
+000004b9 : 405002b3;   % 1640: 	  	sub 	t0, zero, t0 %
+000004ba : 40a60333;   % 1641: PULAABRES:	sub 	t1, a2, a0 %
+000004bb : 00035463;   % 1642: 	   	bge  	t1, zero, PULABBRES %
+000004bc : 40600333;   % 1643: 	   	sub  	t1, zero, t1	 %
+000004bd : 0262d263;   % 1644: PULABBRES: 	bge  	t0, t1, PULACBRES %
+000004be : 00a65e63;   % 1645: 	   	ble  	a0, a2, PULAC1BRES %
+000004bf : 00a007b3;   % 1646: 	   	mv 	a5, a0 %
+000004c0 : 00c00533;   % 1647: 	   	mv 	a0, a2 %
+000004c1 : 00f00633;   % 1648: 	   	mv 	a2, a5 %
+000004c2 : 00b007b3;   % 1649: 	   	mv	a5, a1 %
+000004c3 : 00d005b3;   % 1650: 	   	mv 	a1, a3 %
+000004c4 : 00f006b3;   % 1651: 	   	mv 	a3, a5 %
+000004c5 : 0240006f;   % 1652: PULAC1BRES:	j PLOTLOWBRES %
+000004c6 : 00b6de63;   % 1654: PULACBRES: 	ble  	a1, a3, PULAC2BRES %
+000004c7 : 00a007b3;   % 1655: 	   	mv 	a5, a0 %
+000004c8 : 00c00533;   % 1656: 	   	mv 	a0, a2 %
+000004c9 : 00f00633;   % 1657: 	   	mv 	a2, a5 %
+000004ca : 00b007b3;   % 1658: 	   	mv 	a5, a1 %
+000004cb : 00d005b3;   % 1659: 	   	mv 	a1, a3 %
+000004cc : 00f006b3;   % 1660: 	   	mv 	a3, a5 %
+000004cd : 0600006f;   % 1661: PULAC2BRES:	j PLOTHIGHBRES %
+000004ce : 40a602b3;   % 1663: PLOTLOWBRES:	sub 	t0, a2, a0		# dx=x1-x0 %
+000004cf : 40b68333;   % 1664: 	 	sub 	t1, a3, a1		# dy y1-y0 %
+000004d0 : 00100393;   % 1665: 	 	li  	t2, 1			# yi=1 %
+000004d1 : 00035663;   % 1666: 	 	bge 	t1, zero, PULA1BRES	# dy>=0 PULA %
+000004d2 : fff00393;   % 1667: 	 	li  	t2, -1			# yi=-1 %
+000004d3 : 40600333;   % 1668: 	 	sub 	t1, zero, t1		# dy=-dy %
+000004d4 : 00131e13;   % 1669: PULA1BRES:	slli 	t3, t1, 1		# 2*dy %
+000004d5 : 405e0e33;   % 1670: 		sub 	t3, t3, t0		# D=2*dy-dx %
+000004d6 : 00b00eb3;   % 1671: 		mv 	t4, a1			# y=y0 %
+000004d7 : 00a00f33;   % 1672: 		mv 	t5, a0			# x=x0 %
+000004d8 : 031e8fb3;   % 1674: LOOPx1BRES:	mul 	t6, t4, a7		# y*320 %
+000004d9 : 01ef8fb3;   % 1675: 		add 	t6, t6, t5		# y*320+x %
+000004da : 010f8fb3;   % 1676: 		add 	t6, t6, a6		# 0xFF000000+y*320+x %
+000004db : 00ef8023;   % 1677: 		sb 	a4, 0(t6)		# plot com cor a4 %
+000004dc : 01c05863;   % 1679: 		ble 	t3, zero, PULA2BRES	# D<=0 %
+000004dd : 007e8eb3;   % 1680: 		add 	t4, t4, t2		# y=y+yi %
+000004de : 00129f93;   % 1681: 		slli 	t6, t0, 1		# 2*dx %
+000004df : 41fe0e33;   % 1682: 		sub 	t3, t3, t6		# D=D-2dx %
+000004e0 : 00131f93;   % 1683: PULA2BRES:	slli 	t6, t1, 1		# 2*dy %
+000004e1 : 01fe0e33;   % 1684: 		add 	t3, t3, t6		# D=D+2dx %
+000004e2 : 001f0f13;   % 1685: 		addi	t5, t5, 1 %
+000004e3 : fccf1ae3;   % 1686: 		bne 	t5, a2, LOOPx1BRES %
+000004e4 : 00008067;   % 1687: 		ret %
+000004e5 : 40a602b3;   % 1689: PLOTHIGHBRES: 	sub 	t0, a2, a0		# dx=x1-x0 %
+000004e6 : 40b68333;   % 1690: 	 	sub 	t1, a3, a1		# dy y1-y0 %
+000004e7 : 00100393;   % 1691: 	 	li 	t2, 1			# xi=1 %
+000004e8 : 0002d663;   % 1692: 	 	bge 	t0, zero, PULA3BRES	# dy>=0 PULA %
+000004e9 : fff00393;   % 1693: 	 	li 	t2, -1			# xi=-1 %
+000004ea : 405002b3;   % 1694: 	 	sub 	t0, zero, t0		# dx=-dx %
+000004eb : 00129e13;   % 1695: PULA3BRES:	slli 	t3, t0, 1		# 2*dx %
+000004ec : 406e0e33;   % 1696: 		sub 	t3, t3, t1		# D=2*dx-d1 %
+000004ed : 00a00eb3;   % 1697: 		mv 	t4, a0			# x=x0 %
+000004ee : 00b00f33;   % 1698: 		mv 	t5, a1			# y=y0 %
+000004ef : 031f0fb3;   % 1700: LOOPx2BRES:	mul 	t6, t5, a7		# y*320 %
+000004f0 : 01df8fb3;   % 1701: 		add 	t6, t6, t4		# y*320+x %
+000004f1 : 010f8fb3;   % 1702: 		add 	t6, t6, a6		# 0xFF000000+y*320+x %
+000004f2 : 00ef8023;   % 1703: 		sb 	a4, 0(t6)		# plot com cor a4 %
+000004f3 : 01c05863;   % 1705: 		ble 	t3, zero, PULA4BRES	# D<=0 %
+000004f4 : 007e8eb3;   % 1706: 		add 	t4, t4, t2		# x=x+xi %
+000004f5 : 00131f93;   % 1707: 		slli 	t6, t1, 1		# 2*dy %
+000004f6 : 41fe0e33;   % 1708: 		sub 	t3, t3, t6		# D=D-2dy %
+000004f7 : 00129f93;   % 1709: PULA4BRES: 	slli 	t6, t0, 1		# 2*dy %
+000004f8 : 01fe0e33;   % 1710: 		add 	t3, t3, t6		# D=D+2dx %
+000004f9 : 001f0f13;   % 1711: 		addi 	t5, t5, 1 %
+000004fa : fcdf1ae3;   % 1712: 		bne 	t5, a3, LOOPx2BRES %
+000004fb : 00008067;   % 1713: 		ret		 %
+000004fc : ff2002b7;   % 1727: fdivDE2:	li 	 t0, 0xFF200710		# carrega endereco do FDIVIDER %
+000004fd : 71028293;   % 1727:  %
+000004fe : 0002a503;   % 1728: 		lw 	 a0, 0(t0)		# le a word em t0	No Rars le 0 %
+000004ff : 00051463;   % 1729: 		bne 	 a0, zero, PULAFDIV 	# se a0=0 %
+00000500 : 02000513;   % 1730: 		li 	 a0, 32			# faz divisor a0=32 %
+00000501 : d00570d3;   % 1731: PULAFDIV:	fcvt.s.w ft1, a0		# converte em float %
+00000502 : 03200293;   % 1732: 		li 	 t0, 50			# frequencia base = 50MHz %
+00000503 : d002f053;   % 1733: 		fcvt.s.w ft0, t0		# converte em float %
+00000504 : 18107553;   % 1734: 		fdiv.s   fa0, ft0, ft1		# 50/divisor %
+00000505 : 00008067;   % 1735: fimFDIV:	ret				# retorna %
 END;

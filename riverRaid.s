@@ -1,6 +1,7 @@
 # agua = 0x91 = 145
 # aviao = 0x76 = 118
 # terra = 0x63 = 99
+# frequência na FPGA (PIPELINE): dividida por 4
 .eqv VelPlane 3
 
 .data
@@ -37,7 +38,7 @@ GAMELOOP:
 	#beq s6, zero, SemTiro
 	
 	#bgt 
-	
+	jal GetAxis			# para testar no rars deve comentar esta linha
 	la a0, plane
 	li a1, 160		# altura
 	li a2, 160		# posição 
@@ -76,6 +77,7 @@ GAME_OVER:	la a0, explosion1
 
 .include "include/SetPixels.s"
 .include "include/teclado.s"
+.include "include/GetAxis.s"
 .include "include/controlaVida.s"
 .include "include/mapa.s"
 .include "include/SYSTEMv17.s"
