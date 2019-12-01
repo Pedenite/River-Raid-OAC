@@ -4,63 +4,63 @@ ADDRESS_RADIX = HEX;
 DATA_RADIX = HEX;
 CONTENT
 BEGIN
-00000000 : 00000217;   % 16: 	la tp,exceptionHandling	# carrega em tp o endereço base das rotinas do sistema ECALL %
-00000001 : 21c20213;   % 16:  %
-00000002 : 00521073;   % 17:  	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereço tp %
-00000003 : 0000e073;   % 18:  	csrrsi zero,0,1 	# seta o bit de habilitação de interrupção em ustatus (reg 0)	 %
-00000004 : 06100413;   % 20: 	li s0, 97		# ascii a %
-00000005 : 06400493;   % 21: 	li s1, 100		# ascii d %
-00000006 : 00000913;   % 22: 	li s2, 0		# deslocamento do aviao %
-00000007 : 00000993;   % 23: 	li s3, 0		# tecla pressionada %
-00000008 : 00100a13;   % 24: 	li s4, 1		# vidas %
-00000009 : 00000a93;   % 25: 	li s5, 0		# pontos %
-0000000a : 00000b13;   % 26: 	li s6, 0		# tiro %
-0000000b : 02000d93;   % 27: 	li s11, 32		# ascii <space> %
-0000000c : 0fc10517;   % 29: 	la a0, menu %
-0000000d : 2bc50513;   % 29:  %
-0000000e : 0b400593;   % 30: 	li a1, 180 %
-0000000f : 00000613;   % 31: 	li a2, 0 %
-00000010 : 0a4000ef;   % 32: 	jal SetPixels %
-00000011 : 080a0063;   % 35: 	beq s4, zero, GAME_OVER %
-00000012 : 170000ef;   % 36: 	jal MAPA		# desenha mapa %
-00000013 : 114000ef;   % 40: 	jal GetAxis			# para testar no rars deve comentar esta linha %
-00000014 : 0fc10517;   % 41: 	la a0, plane %
-00000015 : fb050513;   % 41:  %
-00000016 : 0a000593;   % 42: 	li a1, 160		# altura %
-00000017 : 0a000613;   % 43: 	li a2, 160		# posição  %
-00000018 : 01260633;   % 44: 	add a2, a2, s2		# deslocamento %
-00000019 : 00899863;   % 45: 	bne s3, s0, PULA1	# verifica se 'a' está pressionado %
-0000001a : 0fc10517;   % 46: 	la a0, plane_l %
-0000001b : 05850513;   % 46:  %
-0000001c : ffd90913;   % 47: 	addi s2, s2, -3 %
-0000001d : 00999863;   % 48: PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado %
-0000001e : 0fc10517;   % 49: 	la a0, plane_r %
-0000001f : 0dc50513;   % 49:  %
-00000020 : 00390913;   % 50: 	addi s2, s2, 3 %
-00000021 : 060000ef;   % 51: PULA2:	jal SetPixels		# Desenha avião %
-00000022 : 03b99063;   % 53: 	bne s3, s11, PULA3 %
-00000023 : 0fc10517;   % 54: 	la a0, bullet %
-00000024 : 24850513;   % 54:  %
-00000025 : 0a000593;   % 55: 	li a1, 160 %
-00000026 : 0a600613;   % 56: 	li a2, 166 %
-00000027 : 01260633;   % 57: 	add a2, a2, s2 %
-00000028 : 00c00b33;   % 58: 	mv s6, a2 %
-00000029 : 040000ef;   % 59: 	jal SetPixels %
-0000002a : 0f0000ef;   % 61: 	jal ControlaVida %
-0000002b : 00000993;   % 62: 	li s3,0 %
-0000002c : 094000ef;   % 63: 	jal KEY2		# recebe input do teclado %
-0000002d : 01000513;   % 65: 	li a0,16    %
-0000002e : 08400893;   % 66: 	li a7,132 %
-0000002f : 00000073;   % 67: 	ecall			# sleep 16ms %
-00000030 : f85ff06f;   % 68: j GAMELOOP %
-00000031 : 0fc10517;   % 69: GAME_OVER:	la a0, explosion1 %
-00000032 : 15050513;   % 69:  %
-00000033 : 0a000593;   % 70: 		li a1, 160 %
-00000034 : 0a000613;   % 71: 		li a2, 160 %
-00000035 : 01260633;   % 72: 		add a2, a2, s2 %
-00000036 : 00c000ef;   % 73: 		jal SetPixels %
-00000037 : 00a00893;   % 74: 		li a7, 10 %
-00000038 : 00000073;   % 75: 		ecall %
+00000000 : 00000217;   % 17: 	la tp,exceptionHandling	# carrega em tp o endereço base das rotinas do sistema ECALL %
+00000001 : 21c20213;   % 17:  %
+00000002 : 00521073;   % 18:  	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereço tp %
+00000003 : 0000e073;   % 19:  	csrrsi zero,0,1 	# seta o bit de habilitação de interrupção em ustatus (reg 0)	 %
+00000004 : 06100413;   % 21: 	li s0, 97		# ascii a %
+00000005 : 06400493;   % 22: 	li s1, 100		# ascii d %
+00000006 : 00000913;   % 23: 	li s2, 0		# deslocamento do aviao %
+00000007 : 00000993;   % 24: 	li s3, 0		# tecla pressionada %
+00000008 : 00100a13;   % 25: 	li s4, 1		# vidas %
+00000009 : 00000a93;   % 26: 	li s5, 0		# pontos %
+0000000a : 00000b13;   % 27: 	li s6, 0		# tiro %
+0000000b : 02000d93;   % 28: 	li s11, 32		# ascii <space> %
+0000000c : 0fc10517;   % 30: 	la a0, menu %
+0000000d : 2bc50513;   % 30:  %
+0000000e : 0b400593;   % 31: 	li a1, 180 %
+0000000f : 00000613;   % 32: 	li a2, 0 %
+00000010 : 0a4000ef;   % 33: 	jal SetPixels %
+00000011 : 080a0063;   % 36: 	beq s4, zero, GAME_OVER %
+00000012 : 170000ef;   % 37: 	jal MAPA		# desenha mapa %
+00000013 : 114000ef;   % 41: 	jal GetAxis			# para testar no rars deve comentar esta linha %
+00000014 : 0fc10517;   % 42: 	la a0, plane %
+00000015 : fb050513;   % 42:  %
+00000016 : 0a000593;   % 43: 	li a1, 160		# altura %
+00000017 : 0a000613;   % 44: 	li a2, 160		# posição  %
+00000018 : 01260633;   % 45: 	add a2, a2, s2		# deslocamento %
+00000019 : 00899863;   % 46: 	bne s3, s0, PULA1	# verifica se 'a' está pressionado %
+0000001a : 0fc10517;   % 47: 	la a0, plane_l %
+0000001b : 05850513;   % 47:  %
+0000001c : ffd90913;   % 48: 	addi s2, s2, -3 %
+0000001d : 00999863;   % 49: PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado %
+0000001e : 0fc10517;   % 50: 	la a0, plane_r %
+0000001f : 0dc50513;   % 50:  %
+00000020 : 00390913;   % 51: 	addi s2, s2, 3 %
+00000021 : 060000ef;   % 52: PULA2:	jal SetPixels		# Desenha avião %
+00000022 : 03b99063;   % 54: 	bne s3, s11, PULA3 %
+00000023 : 0fc10517;   % 55: 	la a0, bullet %
+00000024 : 24850513;   % 55:  %
+00000025 : 0a000593;   % 56: 	li a1, 160 %
+00000026 : 0a600613;   % 57: 	li a2, 166 %
+00000027 : 01260633;   % 58: 	add a2, a2, s2 %
+00000028 : 00c00b33;   % 59: 	mv s6, a2 %
+00000029 : 040000ef;   % 60: 	jal SetPixels %
+0000002a : 0f0000ef;   % 62: 	jal ControlaVida %
+0000002b : 00000993;   % 63: 	li s3,0 %
+0000002c : 094000ef;   % 64: 	jal KEY2		# recebe input do teclado %
+0000002d : 01000513;   % 66: 	li a0,16    %
+0000002e : 08400893;   % 67: 	li a7,132 %
+0000002f : 00000073;   % 68: 	ecall			# sleep 16ms %
+00000030 : f85ff06f;   % 69: j GAMELOOP %
+00000031 : 0fc10517;   % 70: GAME_OVER:	la a0, explosion1 %
+00000032 : 15050513;   % 70:  %
+00000033 : 0a000593;   % 71: 		li a1, 160 %
+00000034 : 0a000613;   % 72: 		li a2, 160 %
+00000035 : 01260633;   % 73: 		add a2, a2, s2 %
+00000036 : 00c000ef;   % 74: 		jal SetPixels %
+00000037 : 00a00893;   % 75: 		li a7, 10 %
+00000038 : 00000073;   % 76: 		ecall %
 00000039 : ff0002b7;   % 10: SetPixels:	li t0, 0xff000000 %
 0000003a : 00028293;   % 10:  %
 0000003b : 14000313;   % 11: 		li t1, 320 %
