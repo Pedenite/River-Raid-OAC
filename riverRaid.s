@@ -24,13 +24,14 @@ MAIN:
 	li s3, 0		# tecla pressionada
 	li s4, 1		# vidas
 	li s5, 0		# pontos
-	li s6, 0		# tiro
+	li s6, 0		# tiro x
+	li s7, 200		# tiro y
 	li s11, 32		# ascii <space>
 	
-TELAINICIO:	beq s3, s11, SaiTelaInicio
+TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
 		jal KEY2
 		j TELAINICIO
-SaiTelaInicio:	
+SaiTelaInicio:	li s3, 0
 	la a0, menu
 	li a1, 180
 	li a2, 0
@@ -39,10 +40,11 @@ SaiTelaInicio:
 GAMELOOP:
 	beq s4, zero, GAME_OVER
 	jal MAPA		# desenha mapa
-	#beq s6, zero, SemTiro
-	
-	#bgt 
-	jal GetAxis			# para testar no rars deve comentar esta linha
+	li t0, 200
+	beq s7, t0, SemTiro
+	jal TIRO
+SemTiro:	
+	#jal GetAxis		# para testar no rars deve comentar esta linha
 	la a0, plane
 	li a1, 160		# altura
 	li a2, 160		# posição 
@@ -54,14 +56,13 @@ PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado
 	la a0, plane_r
 	addi s2, s2, VelPlane
 PULA2:	jal SetPixels		# Desenha avião
-
+	
 	bne s3, s11, PULA3
-	la a0, bullet
-	li a1, 160
-	li a2, 166
-	add a2, a2, s2
-	mv s6, a2
-	jal SetPixels
+	li t0, 160
+	blt s7, t0, PULA3
+	li s7, 160
+	li s6, 166
+	add s6, s6, s2
 PULA3:
 	jal ControlaVida
 	li s3,0
@@ -83,5 +84,6 @@ GAME_OVER:	la a0, explosion1
 .include "include/teclado.s"
 .include "include/GetAxis.s"
 .include "include/controlaVida.s"
+.include "include/tiro.s"
 .include "include/mapa.s"
 .include "include/SYSTEMv17.s"
