@@ -27,6 +27,10 @@ MAIN:
 	li s6, 0		# tiro
 	li s11, 32		# ascii <space>
 	
+TELAINICIO:	beq s3, s11, SaiTelaInicio
+		jal KEY2
+		j TELAINICIO
+SaiTelaInicio:	
 	la a0, menu
 	li a1, 180
 	li a2, 0

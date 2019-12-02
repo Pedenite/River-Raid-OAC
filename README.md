@@ -10,7 +10,7 @@ Projeto final de OAC UnB 2019/2 - Jogo River Raid em Assembly RV32IMF
 - [x] Uso do processador RISC-V ISA RV32IMF
 - [x] Uso do teclado e controle analógico
 - [ ] Efeitos sonoros e música
-- [ ] Tela inicial
+- [x] Tela inicial
 - [ ] Pontuação
 - [x] Movimentação
 - [x] Animações
