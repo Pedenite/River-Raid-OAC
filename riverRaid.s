@@ -1,7 +1,7 @@
 # agua = 0x91 = 145
 # aviao = 0x76 = 118
 # terra = 0x63 = 99
-# frequência na FPGA (PIPELINE): dividida por 4
+# frequência na FPGA (PIPELINE): dividida por 2
 .eqv VelPlane 3
 
 .data
@@ -40,7 +40,7 @@ SaiTelaInicio:	li s3, 0
 GAMELOOP:
 	beq s4, zero, GAME_OVER
 	jal MAPA		# desenha mapa
-	li t0, 200
+	li t0, 300
 	beq s7, t0, SemTiro
 	jal TIRO
 SemTiro:	
@@ -55,7 +55,7 @@ SemTiro:
 PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado
 	la a0, plane_r
 	addi s2, s2, VelPlane
-PULA2:	jal SetPixels		# Desenha avião
+PULA2:	jal SetRevPixels		# Desenha avião
 	
 	bne s3, s11, PULA3
 	li t0, 160
@@ -81,6 +81,7 @@ GAME_OVER:	la a0, explosion1
 		ecall
 
 .include "include/SetPixels.s"
+.include "include/SetRevPixels.s"
 .include "include/teclado.s"
 .include "include/GetAxis.s"
 .include "include/controlaVida.s"
