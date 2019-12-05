@@ -5,12 +5,16 @@
 .eqv VelPlane 3
 
 .data
-.include "include/plane.data"
-.include "include/plane_l.data"
-.include "include/plane_r.data"
-.include "include/explosion1.data"
-.include "include/bullet.data"
-.include "include/menu.data"
+.include "data/plane.data"
+.include "data/plane_l.data"
+.include "data/plane_r.data"
+.include "data/enemy1_l.data"
+.include "data/enemy2_a1r.data"
+.include "data/enemy2_a2r.data"
+.include "data/enemy3_l.data"
+.include "data/explosion1.data"
+.include "data/bullet.data"
+.include "data/menu.data"
 
 .text
 MAIN:
@@ -25,7 +29,7 @@ MAIN:
 	li s4, 1		# vidas
 	li s5, 0		# pontos
 	li s6, 0		# tiro x
-	li s7, 200		# tiro y
+	li s7, 300		# tiro y
 	li s11, 32		# ascii <space>
 	
 TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
@@ -36,7 +40,7 @@ SaiTelaInicio:	li s3, 0
 	li a1, 180
 	li a2, 0
 	jal SetPixels
-
+	li s7, 300
 GAMELOOP:
 	beq s4, zero, GAME_OVER
 	jal MAPA		# desenha mapa
@@ -55,7 +59,7 @@ SemTiro:
 PULA1:	bne s3, s1, PULA2	# verifica se 'd' está pressionado
 	la a0, plane_r
 	addi s2, s2, VelPlane
-PULA2:	jal SetRevPixels		# Desenha avião
+PULA2:	jal SetPixels		# Desenha avião
 	
 	bne s3, s11, PULA3
 	li t0, 160
