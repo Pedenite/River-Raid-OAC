@@ -10,9 +10,9 @@ TIRO:	addi s7, s7, -VelTiro
 	la a0, bullet
 	mv a1, s7
 	mv a2, s6
-	sw ra, -4(sp)
+	mv t6, ra
 	jal SetPixels
-	lw ra, -4(sp)
+	mv ra, t6
 	j FimTiro
 DestroiTiro:
 	li s7, 300

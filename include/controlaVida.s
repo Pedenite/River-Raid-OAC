@@ -10,6 +10,7 @@ ControlaVida:	li t0, 64		# limite esquerda
 		blt a2, t0, MORTE
 		addi a2, a2, 14		# largura do avião
 		bgt a2, t1, MORTE
-		j AINDAVIVO
-MORTE:		addi s4, s4, -1
 AINDAVIVO:	ret
+MORTE:		addi s4, s4, -1
+		j GAME_OVER
+
