@@ -23,7 +23,7 @@ VoltaEB:	addi a3, a3, 8
 		j LoopEB
 SemInimigo:	ret
 
-EnemyDestroy:	sw zero, (a3)
+EnemyFlee:	sw zero, (a3)
 		sw zero, 4(a3)
 		lw t0, (sp)
 		bne t0, zero, LoopED
@@ -36,6 +36,28 @@ LoopED:		lw t1, 4(sp)			# faz um swap de inimigos caso o destruido não esteja no
 		sw x0, 4(sp)
 		addi sp, sp, 8
 		j VoltaEB
+		
+PlayerDeath:	li s7, 300			# destroi tiro
+		addi s5, s5, 30			# ganha 30 pontos
+		la a0, explosion5
+		mv a1, t2
+		mv a2, t1
+		mv t6, ra
+		jal SetPixels
+		mv ra, t6
+		sw zero, (a3)
+		sw zero, 4(a3)
+		lw t0, (sp)
+		bne t0, zero, LoopEDA
+		addi sp, sp, 8			# caso o inimigo esteja no topo da pilha
+		j MORTE
+LoopEDA:	lw t1, 4(sp)			# faz um swap de inimigos caso o destruido não esteja no topo
+		sw t0, (a3)
+		sw t1, 4(a3)
+		sw x0, (sp)
+		sw x0, 4(sp)
+		addi sp, sp, 8
+		j MORTE
 
 #############################################Inimigo 1##########################################################
 # largura = 32
@@ -43,11 +65,30 @@ LoopED:		lw t1, 4(sp)			# faz um swap de inimigos caso o destruido não esteja no
 # pontos = 30
 En1Ctrl:	andi t0, t0, 1			# verifica a direção do inimigo
 		lw t1, (a3)
-		srli t2, t1, 16
-		andi t1, t1, 0x7ff		# carrega posição do inimigo
+		srli t2, t1, 16			# posição y
+		andi t1, t1, 0x7ff		# posição x
 		li t3, 172			# 240-60-8
-		bge t2, t3, EnemyDestroy	# Remove o inimigo da pilha
-		la a0, enemy1_l
+		bge t2, t3, EnemyFlee		# Remove o inimigo da pilha
+		addi t3, t2, 8			# soma altura do inimigo		
+		andi t4, s7, 0x7ff		# obtém a coordenada y do tiro (está ao contrário)
+		blt t3, t4, En1Vivo
+		addi t4, t4, 8
+		bgt t2, t4, En1Vivo
+		srli t4, s7, 16			# obtém a posição x do tiro
+		bgt t1, t4, En1Vivo
+		addi t3, t1, 32
+		blt t3, t4, En1Vivo
+		j DestroyEn1
+En1Vivo:	li t3, 160
+		addi t4, t2, 8
+		blt t4, t3, En1VivoA
+		addi t3, s2, 160		# obtém a posição x do avião
+		addi t4, t1, 32
+		blt t4, t3, En1VivoA
+		addi t3, t3, 12			# soma a largura do avião
+		bgt t1, t3, En1VivoA
+		j PlayerDeath
+En1VivoA:	la a0, enemy1_l
 		mv a1, t2
 		mv a2, t1
 		beq t0, zero, En1L
@@ -85,17 +126,46 @@ ContinuaEn1:	or t1, t2, t1
 		sw t1, (a3)
 		j VoltaEB
 		
+DestroyEn1:	li s7, 300			# destroi tiro
+		addi s5, s5, 30			# ganha 30 pontos
+		la a0, explosion5
+		mv a1, t2
+		mv a2, t1
+		mv t6, ra
+		jal SetPixels
+		mv ra, t6
+		j EnemyFlee
+		
 #############################################Inimigo 2##########################################################
 # largura = 16
 # altura = 10
 # pontos = 60
 En2Ctrl1:	andi t0, t0, 1			# verifica a direção do inimigo
 		lw t1, (a3)
-		srli t2, t1, 16
-		andi t1, t1, 0x7ff		# carrega posição do inimigo
+		srli t2, t1, 16			# posição y
+		andi t1, t1, 0x7ff		# posição x
 		li t3, 170			# 240-6-10
-		bge t2, t3, EnemyDestroy	# Remove o inimigo da pilha
-		la a0, enemy2_a1r
+		bge t2, t3, EnemyFlee		# Remove o inimigo da pilha
+		addi t3, t2, 10			# soma altura do inimigo		
+		andi t4, s7, 0x7ff		# obtém a coordenada y do tiro (está ao contrário)
+		blt t3, t4, En2Vivo1
+		addi t4, t4, 8
+		bgt t2, t4, En2Vivo1
+		srli t4, s7, 16			# obtém a posição x do tiro
+		bgt t1, t4, En2Vivo1
+		addi t3, t1, 16
+		blt t3, t4, En2Vivo1
+		j DestroyEn2
+En2Vivo1:	li t3, 160
+		addi t4, t2, 10
+		blt t4, t3, En2VivoA1
+		addi t3, s2, 160		# obtém a posição x do avião
+		addi t4, t1, 16
+		blt t4, t3, En2VivoA1
+		addi t3, t3, 12			# soma a largura do avião
+		bgt t1, t3, En2VivoA1
+		j PlayerDeath
+En2VivoA1:	la a0, enemy2_a1r
 		mv a1, t2
 		mv a2, t1
 		beq t0, zero, En2R
@@ -103,9 +173,30 @@ En2Ctrl1:	andi t0, t0, 1			# verifica a direção do inimigo
 		
 En2Ctrl2:	andi t0, t0, 1			# verifica a direção do inimigo
 		lw t1, (a3)
-		srli t2, t1, 16
-		andi t1, t1, 0x7ff		# carrega posição do inimigo
-		la a0, enemy2_a2r
+		srli t2, t1, 16			# posição y
+		andi t1, t1, 0x7ff		# posição x
+		li t3, 170			# 240-6-10
+		bge t2, t3, EnemyFlee		# Remove o inimigo da pilha
+		addi t3, t2, 10			# soma altura do inimigo		
+		andi t4, s7, 0x7ff		# obtém a coordenada y do tiro (está ao contrário)
+		blt t3, t4, En2Vivo2
+		addi t4, t4, 8
+		bgt t2, t4, En2Vivo2
+		srli t4, s7, 16			# obtém a posição x do tiro
+		bgt t1, t4, En2Vivo2
+		addi t3, t1, 16
+		blt t3, t4, En2Vivo2
+		j DestroyEn2
+En2Vivo2:	li t3, 160
+		addi t4, t2, 10
+		blt t4, t3, En2VivoA2
+		addi t3, s2, 160		# obtém a posição x do avião
+		addi t4, t1, 16
+		blt t4, t3, En2VivoA2
+		addi t3, t3, 12			# soma a largura do avião
+		bgt t1, t3, En2VivoA2
+		j PlayerDeath
+En2VivoA2:	la a0, enemy2_a2r
 		mv a1, t2
 		mv a2, t1
 		beq t0, zero, En2R		
@@ -145,5 +236,15 @@ ContinuaEn2:	or t1, t2, t1
 		sw t0, 4(a3)
 		sw t1, (a3)
 		j VoltaEB
+		
+DestroyEn2:	li s7, 300			# destroi tiro
+		addi s5, s5, 60			# ganha 60 pontos
+		la a0, explosion4
+		mv a1, t2
+		mv a2, t1
+		mv t6, ra
+		jal SetPixels
+		mv ra, t6
+		j EnemyFlee
 		
 #############################################Inimigo 3##########################################################

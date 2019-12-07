@@ -13,6 +13,10 @@
 .include "data/enemy2_a2r.data"
 .include "data/enemy3_l.data"
 .include "data/explosion1.data"
+.include "data/explosion2.data"
+.include "data/explosion3.data"
+.include "data/explosion4.data"
+.include "data/explosion5.data"
 .include "data/bullet.data"
 .include "data/menu.data"
 .include "data/V0.data"
@@ -33,7 +37,7 @@ MAIN:
 	li s4, 3		# vidas
 	li s5, 0		# pontos
 	li s6, 0		# contador para gerador de inimigos
-	li s7, 300		# coordenadas do tiro (obs: 300 = sem tiro)
+	li s7, 300		# coordenadas do tiro xy(obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
 	li s11, 32		# ascii <space>
 	

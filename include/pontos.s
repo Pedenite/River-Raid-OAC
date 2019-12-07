@@ -7,8 +7,8 @@
 PONTOS:	mv a0, s5
 	li a1, 100
 	li a2, 190
-	li a3, 0xff
+	li a3, 118
 	li a4, 0
-	li a7, 101
+	li a7, 136
 	ecall
 	ret
