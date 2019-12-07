@@ -32,11 +32,16 @@ MAIN:
 	li s7, 300		# tiro y
 	mv s8, sp		# guarda sp inicial
 	li s11, 32		# ascii <space>
-	addi sp, sp, -8
-	li t0, 4
-	li t1, 100
+	
+	addi sp, sp, -16	# adiciona 2 inimigos iniciais
+	li t0, 4		# inimigo 2
+	li t1, 100		# y=0, x=100
 	sw t0, 4(sp)
 	sw t1, (sp)
+	li t0, 2		# inimigo 1
+	li t1, 0x003c008c	# y=60, x=140
+	sw t0, 12(sp)
+	sw t1, 8(sp)		
 	
 TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
 		jal KEY2

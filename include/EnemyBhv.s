@@ -29,7 +29,13 @@ EnemyDestroy:	sw zero, (a3)
 		bne t0, zero, LoopED
 		addi sp, sp, 8			# caso o inimigo esteja no topo da pilha
 		j VoltaEB
-LoopED:		
+LoopED:		lw t1, 4(sp)			# faz um swap de inimigos caso o destruido não esteja no topo
+		sw t0, (a3)
+		sw t1, 4(a3)
+		sw x0, (sp)
+		sw x0, 4(sp)
+		addi sp, sp, 8
+		j VoltaEB
 
 #############################################Inimigo 1##########################################################
 # largura = 32
