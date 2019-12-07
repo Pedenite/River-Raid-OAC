@@ -15,6 +15,10 @@
 .include "data/explosion1.data"
 .include "data/bullet.data"
 .include "data/menu.data"
+.include "data/V0.data"
+.include "data/V1.data"
+.include "data/V2.data"
+.include "data/V3.data"
 
 .text
 MAIN:
@@ -28,8 +32,8 @@ MAIN:
 	li s3, 0		# tecla pressionada
 	li s4, 3		# vidas
 	li s5, 0		# pontos
-	li s6, 0		# tiro x
-	li s7, 300		# tiro y
+	li s6, 0		# contador para gerador de inimigos
+	li s7, 300		# coordenadas do tiro (obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
 	li s11, 32		# ascii <space>
 	
@@ -50,15 +54,35 @@ SaiTelaInicio:	li s3, 0
 		la a0, menu
 		li a1, 180
 		li a2, 0
-		jal SetPixels
+		jal SetPixels	# pinta menu
 		li s2, 0
 		li s7, 300
+		
+		li a1, 220
+		li a2, 100
+		li t0, 3
+		bne s4, t0, Vida2
+		la a0, V3
+		j PrintaVidas
+Vida2:		li t0, 2
+		bne s4, t0, Vida1
+		la a0, V2
+		j PrintaVidas
+Vida1:		li t0, 1
+		bne s4, t0, Vida0
+		la a0, V1
+		j PrintaVidas
+Vida0:		la a0, V0
+PrintaVidas:	jal SetPixels
+		
 GAMELOOP:
+		jal PONTOS
 		jal MAPA		# desenha mapa
 		li t0, 300
 		beq s7, t0, SemTiro
 		jal TIRO
 SemTiro:	
+		jal EnemySpawn
 		jal EnemyBhv
 		#jal GetAxis		# para testar no rars deve comentar esta linha
 		la a0, plane
@@ -73,12 +97,15 @@ PULA1:		bne s3, s1, PULA2	# verifica se 'd' está pressionado
 		addi s2, s2, VelPlane
 PULA2:		jal SetPixels		# Desenha avião
 	
-		bne s3, s11, PULA3
+		bne s3, s11, PULA3	# verifica se espaço foi pressionado
 		li t0, 160
-		blt s7, t0, PULA3
+		andi t1, s7, 0x7ff
+		blt t1, t0, PULA3	# permite apenas 1 tiro de cada vez
 		li s7, 160
-		li s6, 166
-		add s6, s6, s2
+		li t0, 166
+		add t0, t0, s2
+		slli t0, t0, 16
+		or s7, t0, s7		# junta as coordenadas do tiro
 PULA3:
 		jal ControlaVida
 		li s3,0
@@ -95,15 +122,21 @@ GAME_OVER:	la a0, explosion1
 		add a2, a2, s2
 		jal SetPixels
 		bne s4, zero, TELAINICIO
+		la a0, V0
+		li a1, 220
+		li a2, 100
+		jal SetPixels
 		li a7, 10
 		ecall
 
 .include "include/SetPixels.s"
 .include "include/SetRevPixels.s"
 .include "include/EnemyBhv.s"
+.include "include/EnemySpawn.s"
 .include "include/teclado.s"
 .include "include/GetAxis.s"
 .include "include/controlaVida.s"
 .include "include/tiro.s"
 .include "include/mapa.s"
+.include "include/pontos.s"
 .include "include/SYSTEMv17.s"

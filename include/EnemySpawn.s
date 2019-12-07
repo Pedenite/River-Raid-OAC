@@ -6,10 +6,14 @@
 # a posição y e o resto, a posição x						#
 #################################################################################
 
-.eqv QtdEnemies 4			# quantidade de tipos de inimigos +1
+.eqv QtdEnemies 3			# quantidade de tipos de inimigos
 
 .text
-EnemySpawn:	li a7, 41
+EnemySpawn:	addi s6, s6, 1
+		li t0, 60
+		blt s6, t0, NoEnemy	# permite o spawn de inimigos aproximadamete a cada 1 segundo (na FPGA)
+		li s6, 0
+		li a7, 41
 		ecall			# Rand
 		li t0, QtdEnemies
 		remu t0, a0, t0
@@ -18,7 +22,7 @@ EnemySpawn:	li a7, 41
 		li t1, 2
 		beq t0, t1, GeraEn2
 		li t1, 3
-		beq t0, t1, GeraEn3
+#		beq t0, t1, GeraEn3
 NoEnemy:	ret
 
 GeraPosXEn:	li t1, 172		# gera posição x do inimigo (Inimigo mais longo = 20)=>192-20
@@ -35,7 +39,7 @@ GeraEn1:	li t0, 1		# tipo
 		addi sp, sp, -8
 		sw t0, 4(sp)		# guarda o tipo de inimigo na pilha
 		jal t0, GeraPosXEn
-		sw t0, (sp)		# vai guardar na pilha a posição y = 0 e a posição x do inimigo
+		sw t1, (sp)		# vai guardar na pilha a posição y = 0 e a posição x do inimigo
 		ret
 		
 GeraEn2:	li t0, 2		# tipo
@@ -43,7 +47,7 @@ GeraEn2:	li t0, 2		# tipo
 		addi sp, sp, -8
 		sw t0, 4(sp)		# guarda o tipo de inimigo na pilha
 		jal t0, GeraPosXEn	
-		sw t0, (sp)		# vai guardar na pilha a posição y = 0 e a posição x do inimigo
+		sw t1, (sp)		# vai guardar na pilha a posição y = 0 e a posição x do inimigo
 		ret
 		
 GeraEn3:	li t0, 4		# tipo
