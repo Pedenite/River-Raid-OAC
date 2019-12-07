@@ -11,12 +11,12 @@ Projeto final de OAC UnB 2019/2 - Jogo River Raid em Assembly RV32IMF
 - [x] Uso do teclado e controle analógico
 - [ ] Efeitos sonoros e música
 - [x] Tela inicial
-- [ ] Pontuação
+- [x] Pontuação
 - [x] Movimentação
 - [x] Animações
 - [x] Atirar
-- [ ] Inimigos
-- [ ] Mapa andar
+- [x] Inimigos
+- [x] Mapa andar
 - [ ] Tipo de tiros
 - [ ] Inimigos novos
 - [ ] Relatório
