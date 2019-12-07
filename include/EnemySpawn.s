@@ -12,7 +12,7 @@
 EnemySpawn:	li a7, 41
 		ecall			# Rand
 		li t0, QtdEnemies
-		rem t0, a0, t0
+		remu t0, a0, t0
 		li t1, 1
 		beq t0, t1, GeraEn1
 		li t1, 2
@@ -22,12 +22,12 @@ EnemySpawn:	li a7, 41
 NoEnemy:	ret
 
 GeraPosXEn:	li t1, 172		# gera posição x do inimigo (Inimigo mais longo = 20)=>192-20
-		rem t1, a0, t1
+		remu t1, a0, t1
 		addi t1, t1, 64		# parede esquerda
 		jalr zero, t0, 0
 		
 GeraPosYEn:	li t1, 120		# gera posição y do inimigo
-		rem t1, a0, t1
+		remu t1, a0, t1
 		jalr zero, t0, 0
 		
 GeraEn1:	li t0, 1		# tipo

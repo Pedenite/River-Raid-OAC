@@ -30,10 +30,10 @@ MAIN:
 	li s5, 0		# pontos
 	li s6, 0		# tiro x
 	li s7, 300		# tiro y
-	mv tp, sp		# guarda sp inicial
+	mv s8, sp		# guarda sp inicial
 	li s11, 32		# ascii <space>
 	addi sp, sp, -8
-	li t0, 5
+	li t0, 4
 	li t1, 100
 	sw t0, 4(sp)
 	sw t1, (sp)
