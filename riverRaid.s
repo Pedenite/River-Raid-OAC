@@ -32,6 +32,11 @@ MAIN:
 	li s7, 300		# tiro y
 	mv tp, sp		# guarda sp inicial
 	li s11, 32		# ascii <space>
+	addi sp, sp, -8
+	li t0, 5
+	li t1, 100
+	sw t0, 4(sp)
+	sw t1, (sp)
 	
 TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
 		jal KEY2

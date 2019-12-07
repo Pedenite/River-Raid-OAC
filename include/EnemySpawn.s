@@ -46,7 +46,7 @@ GeraEn2:	li t0, 2		# tipo
 		sw t0, (sp)		# vai guardar na pilha a posição y = 0 e a posição x do inimigo
 		ret
 		
-GeraEn3:	li t0, 3		# tipo
+GeraEn3:	li t0, 4		# tipo
 		slli t0, t0, 1		# direção = 0
 		addi sp, sp, -8
 		sw t0, 4(sp)		# guarda o tipo de inimigo na pilha
