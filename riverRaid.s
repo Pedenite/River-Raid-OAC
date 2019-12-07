@@ -12,6 +12,7 @@
 .include "data/enemy2_a1r.data"
 .include "data/enemy2_a2r.data"
 .include "data/enemy3_l.data"
+.include "data/fuel.data"
 .include "data/explosion1.data"
 .include "data/explosion2.data"
 .include "data/explosion3.data"
@@ -34,14 +35,15 @@ MAIN:
 	li s1, 100		# ascii d
 	li s2, 0		# deslocamento do aviao
 	li s3, 0		# tecla pressionada
-	li s4, 3		# vidas
+	li s4, 4		# vidas
 	li s5, 0		# pontos
 	li s6, 0		# contador para gerador de inimigos
 	li s7, 300		# coordenadas do tiro xy(obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
+	li s9, 500000		# combustível
 	li s11, 32		# ascii <space>
 	
-	addi sp, sp, -16	# adiciona 2 inimigos iniciais
+	addi sp, sp, -24	# adiciona 2 inimigos e um fuel iniciais
 	li t0, 4		# inimigo 2
 	li t1, 100		# y=0, x=100
 	sw t0, 4(sp)
@@ -49,7 +51,11 @@ MAIN:
 	li t0, 2		# inimigo 1
 	li t1, 0x003c008c	# y=60, x=140
 	sw t0, 12(sp)
-	sw t1, 8(sp)		
+	sw t1, 8(sp)
+	li t0, 10		# fuel
+	li t1, 0x001400b4	# y=20, x=180
+	sw t0, 20(sp)
+	sw t1, 16(sp)	
 	
 TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
 		jal KEY2
@@ -61,18 +67,19 @@ SaiTelaInicio:	li s3, 0
 		jal SetPixels	# pinta menu
 		li s2, 0
 		li s7, 300
+		li s9, 500000
 		
 		li a1, 220
 		li a2, 100
-		li t0, 3
+		li t0, 4
 		bne s4, t0, Vida2
 		la a0, V3
 		j PrintaVidas
-Vida2:		li t0, 2
+Vida2:		li t0, 3
 		bne s4, t0, Vida1
 		la a0, V2
 		j PrintaVidas
-Vida1:		li t0, 1
+Vida1:		li t0, 2
 		bne s4, t0, Vida0
 		la a0, V1
 		j PrintaVidas
@@ -110,7 +117,8 @@ PULA2:		jal SetPixels		# Desenha avião
 		add t0, t0, s2
 		slli t0, t0, 16
 		or s7, t0, s7		# junta as coordenadas do tiro
-PULA3:
+
+PULA3:		jal FuelCtrl
 		jal ControlaVida
 		li s3,0
 		jal KEY2		# recebe input do teclado
@@ -126,10 +134,6 @@ GAME_OVER:	la a0, explosion1
 		add a2, a2, s2
 		jal SetPixels
 		bne s4, zero, TELAINICIO
-		la a0, V0
-		li a1, 220
-		li a2, 100
-		jal SetPixels
 		li a7, 10
 		ecall
 
@@ -140,6 +144,7 @@ GAME_OVER:	la a0, explosion1
 .include "include/teclado.s"
 .include "include/GetAxis.s"
 .include "include/controlaVida.s"
+.include "include/fuelCtrl.s"
 .include "include/tiro.s"
 .include "include/mapa.s"
 .include "include/pontos.s"

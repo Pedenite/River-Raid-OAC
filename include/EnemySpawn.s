@@ -6,7 +6,7 @@
 # a posição y e o resto, a posição x						#
 #################################################################################
 
-.eqv QtdEnemies 4			# quantidade de tipos de inimigos+1
+.eqv QtdEnemies 5			# quantidade de tipos de inimigos + Fuel +1
 
 .text
 EnemySpawn:	addi s6, s6, 1
@@ -23,6 +23,8 @@ EnemySpawn:	addi s6, s6, 1
 		beq t0, t1, GeraEn2
 		li t1, 3
 		beq t0, t1, GeraEn3
+		li t1, 4
+		beq t0, t1, GeraFuel
 NoEnemy:	ret
 
 GeraPosXEn:	li t1, 172		# gera posição x do inimigo (Inimigo mais longo = 20)=>192-20
@@ -60,4 +62,12 @@ GeraEn3:	li t0, 4		# tipo
 		li t0, 304		# posição x
 		or t0, t1, t0
 		sw t0, (sp)		# vai guardar na pilha a posição y e a posição x do inimigo
+		ret
+
+GeraFuel:	li t0, 5
+		slli t0, t0, 1
+		addi sp, sp, -8
+		sw t0, 4(sp)
+		jal t0, GeraPosXEn
+		sw t1, (sp)
 		ret

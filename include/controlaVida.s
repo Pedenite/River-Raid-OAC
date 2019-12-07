@@ -13,6 +13,7 @@ ContinuaVida:	li t0, 64		# limite esquerda
 		blt a2, t0, MORTE	# morte por parede esquerda
 		addi a2, a2, 14		# largura do avião
 		bgt a2, t1, MORTE	# morte por parede direita
+		ble s9, zero, MORTE	# morte por falta de combustível
 AINDAVIVO:	ret
 MORTE:		addi s4, s4, -1
 		j GAME_OVER
