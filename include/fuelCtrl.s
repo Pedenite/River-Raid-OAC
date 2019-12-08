@@ -14,7 +14,7 @@ FuelCtrl:	la a0, debug
 		mv t6, ra
 		jal SetPixels
 		mv ra, t6
-		li t0, 5000
+		li t0, 20
 		div a0, s9, t0
 		li a1, 100
 		li a2, 204
@@ -26,11 +26,11 @@ FuelCtrl:	la a0, debug
 		li a1, 124
 		li a7, 104
 		ecall
-		li t0, 500000
-		bgt s9, t0, ResetaFuel
+		li t0, 2000
+		bgt s9, t0, ResetaFuel		# não permite mais de 100% de combustível
 		addi s9, s9, -1
 		ret
-ResetaFuel:	li s9, 500000
+ResetaFuel:	li s9, 2000
 		ret
 		
 		

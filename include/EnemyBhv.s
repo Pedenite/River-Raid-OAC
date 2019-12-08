@@ -347,7 +347,7 @@ FVivo:		li t3, 160
 		blt t4, t3, FVivoA
 		addi t3, t3, 12			# soma a largura do avião
 		bgt t1, t3, FVivoA
-		addi s9, s9, 500
+		addi s9, s9, 20
 		
 FVivoA:		la a0, fuel
 		mv a1, t2

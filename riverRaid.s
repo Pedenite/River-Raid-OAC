@@ -39,11 +39,11 @@ MAIN:
 	li s2, 0		# deslocamento do aviao
 	li s3, 0		# tecla pressionada
 	li s4, 4		# vidas
-	li s5, 15000		# pontos
+	li s5, 0		# pontos
 	li s6, 0		# contador para gerador de inimigos
 	li s7, 300		# coordenadas do tiro xy(obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
-	li s9, 500000		# combustível
+	li s9, 2000		# combustível
 	li s11, 32		# ascii <space>
 	
 	addi sp, sp, -24	# adiciona 2 inimigos e um fuel iniciais
@@ -70,7 +70,7 @@ SaiTelaInicio:	li s3, 0
 		jal SetPixels	# pinta menu
 		li s2, 0
 		li s7, 300
-		li s9, 500000
+		li s9, 2000
 		
 		li a1, 220
 		li a2, 100

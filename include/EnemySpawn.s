@@ -11,10 +11,10 @@
 .text
 EnemySpawn:	addi s6, s6, 1
 Easy:		li t0, 60
-		li t1, 1000
+		li t1, 500
 		blt s5, t1, Difficulty
 Medium:		li t0, 40
-		li t1, 5000
+		li t1, 2000
 		blt s5, t1, Difficulty
 Hard:		li t0, 20
 		li t1, 15000
@@ -34,7 +34,7 @@ E_MEDIUM:	li t1, 2000
 		bgt s5, t1, E_HARD
 		addi t0, t0, -2
 		j E_Continua
-E_HARD:		li t1, 10000
+E_HARD:		li t1, 5000
 		bgt s5, t1, E_ULTRAHARD
 		addi t0, t0, -1
 		j E_Continua
