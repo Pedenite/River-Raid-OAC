@@ -19,6 +19,6 @@ Projeto final de OAC UnB 2019/2 - Jogo River Raid em Assembly RV32IMF
 - [x] Mapa andar
 - [x] Combustível
 - [ ] Tipo de tiros
-- [ ] Inimigos novos
-- [ ] Dificuldade crescente
+- [x] Inimigos novos
+- [x] Dificuldade crescente
 - [ ] Relatório

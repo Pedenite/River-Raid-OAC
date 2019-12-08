@@ -12,6 +12,9 @@
 .include "data/enemy2_a1r.data"
 .include "data/enemy2_a2r.data"
 .include "data/enemy3_l.data"
+.include "data/enemy4.data"
+.include "data/enemy5_l.data"
+.include "data/enemy6.data"
 .include "data/fuel.data"
 .include "data/explosion1.data"
 .include "data/explosion2.data"
@@ -36,7 +39,7 @@ MAIN:
 	li s2, 0		# deslocamento do aviao
 	li s3, 0		# tecla pressionada
 	li s4, 4		# vidas
-	li s5, 0		# pontos
+	li s5, 15000		# pontos
 	li s6, 0		# contador para gerador de inimigos
 	li s7, 300		# coordenadas do tiro xy(obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
@@ -123,9 +126,9 @@ PULA3:		jal FuelCtrl
 		li s3,0
 		jal KEY2		# recebe input do teclado
 				
-		li a0,16  
+		li a0,20  
 		li a7,132
-		ecall			# sleep 16ms
+		ecall			# sleep 20ms
 j GAMELOOP
 		
 GAME_OVER:	la a0, explosion1
