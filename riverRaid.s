@@ -1,7 +1,7 @@
 # agua = 0x91 = 145
 # aviao = 0x76 = 118
 # terra = 0x63 = 99
-# frequência na FPGA (PIPELINE): dividida por 2
+# frequï¿½ncia na FPGA (PIPELINE): dividida por 2
 .eqv VelPlane 3
 
 .data
@@ -30,9 +30,9 @@
 
 .text
 MAIN:
-	la tp,exceptionHandling	# carrega em tp o endereço base das rotinas do sistema ECALL
- 	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereço tp
- 	csrrsi zero,0,1 	# seta o bit de habilitação de interrupção em ustatus (reg 0)	
+	la tp,exceptionHandling	# carrega em tp o endereï¿½o base das rotinas do sistema ECALL
+ 	csrrw zero,5,tp 	# seta utvec (reg 5) para o endereï¿½o tp
+ 	csrrsi zero,0,1 	# seta o bit de habilitaï¿½ï¿½o de interrupï¿½ï¿½o em ustatus (reg 0)	
 	
 	li s0, 97		# ascii a
 	li s1, 100		# ascii d
@@ -43,7 +43,7 @@ MAIN:
 	li s6, 0		# contador para gerador de inimigos
 	li s7, 300		# coordenadas do tiro xy(obs: 300 = sem tiro)
 	mv s8, sp		# guarda sp inicial
-	li s9, 2000		# combustível
+	li s9, 2000		# combustï¿½vel
 	li s11, 32		# ascii <space>
 	
 	addi sp, sp, -24	# adiciona 2 inimigos e um fuel iniciais
@@ -60,7 +60,7 @@ MAIN:
 	sw t0, 20(sp)
 	sw t1, 16(sp)	
 	
-TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial será carregada diretamente na frame 0 da FPGA devido a limitações de memória
+TELAINICIO:	beq s3, s11, SaiTelaInicio	# a tela inicial serï¿½ carregada diretamente na frame 0 da FPGA devido a limitaï¿½ï¿½es de memï¿½ria
 		jal KEY2
 		j TELAINICIO
 SaiTelaInicio:	li s3, 0
@@ -90,6 +90,7 @@ Vida0:		la a0, V0
 PrintaVidas:	jal SetPixels
 		
 GAMELOOP:
+	jal MUSICA
 		jal PONTOS
 		jal MAPA		# desenha mapa
 		li t0, 300
@@ -101,17 +102,17 @@ SemTiro:
 		#jal GetAxis		# para testar no rars deve comentar esta linha
 		la a0, plane
 		li a1, 160		# altura
-		li a2, 160		# posição 
+		li a2, 160		# posiï¿½ï¿½o 
 		add a2, a2, s2		# deslocamento
-		bne s3, s0, PULA1	# verifica se 'a' está pressionado
+		bne s3, s0, PULA1	# verifica se 'a' estï¿½ pressionado
 		la a0, plane_l
 		addi s2, s2, -VelPlane
-PULA1:		bne s3, s1, PULA2	# verifica se 'd' está pressionado
+PULA1:		bne s3, s1, PULA2	# verifica se 'd' estï¿½ pressionado
 		la a0, plane_r
 		addi s2, s2, VelPlane
-PULA2:		jal SetPixels		# Desenha avião
+PULA2:		jal SetPixels		# Desenha aviï¿½o
 	
-		bne s3, s11, PULA3	# verifica se espaço foi pressionado
+		bne s3, s11, PULA3	# verifica se espaï¿½o foi pressionado
 		li t0, 160
 		andi t1, s7, 0x7ff
 		blt t1, t0, PULA3	# permite apenas 1 tiro de cada vez
@@ -152,3 +153,4 @@ GAME_OVER:	la a0, explosion1
 .include "include/mapa.s"
 .include "include/pontos.s"
 .include "include/SYSTEMv17.s"
+.include "include/musica.s"
