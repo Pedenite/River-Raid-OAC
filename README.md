@@ -1,5 +1,7 @@
 # River Raid OAC
 Projeto final de OAC UnB 2019/2 - Jogo River Raid em Assembly RV32IMF
+
+Link do vídeo da apresentação: https://youtu.be/67Au6zkLdYo
 - Cor da água = 0x99 = 145
 - Cor do aviao = 0x76 = 118
 - Cor da terra = 0x63 = 99
