@@ -99,7 +99,7 @@ GAMELOOP:
 SemTiro:	
 		jal EnemySpawn
 		jal EnemyBhv
-		#jal GetAxis		# para testar no rars deve comentar esta linha
+		jal GetAxis		# para testar no rars deve comentar esta linha
 		la a0, plane
 		li a1, 160		# altura
 		li a2, 160		# posi��o 
@@ -138,6 +138,27 @@ GAME_OVER:	la a0, explosion1
 		add a2, a2, s2
 		jal SetPixels
 		bne s4, zero, TELAINICIO
+		li a0, 200
+		li a7, 132
+		ecall
+		li a0, 66
+		li a1, 500
+		li a2, 1
+		li a3, 200
+		li a7, 33
+		ecall
+		li a0, 64
+		li a1, 500
+		li a2, 1
+		li a3, 200
+		li a7, 33
+		ecall
+		li a0, 62
+		li a1, 2000
+		li a2, 1
+		li a3, 200
+		li a7, 33
+		ecall
 		li a7, 10
 		ecall
 

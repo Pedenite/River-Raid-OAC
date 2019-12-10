@@ -4,6 +4,9 @@
 #################################################################################
 .eqv VelTiro 5
 
+.data
+TIRO_EXECUTA: .word 0
+
 .text
 TIRO:	srli t0, s7, 16
 	andi s7, s7, 0x7ff		# separa as coordenadas do tiro
@@ -17,9 +20,26 @@ TIRO:	srli t0, s7, 16
 	mv t6, ra
 	jal SetPixels
 	mv ra, t6
+	
+	la a0, TIRO_EXECUTA
+	lw a0, 0(a0)
+	bne a0, zero, FimTiro
+	la a0, TIRO_EXECUTA
+	li a1, 1
+	sw a1, 0(a0)
+	li a0, 76
+	li a1, 1000
+	li a2, 1
+	li a3, 200
+	li a7, 31
+	ecall
+	
 	j FimTiro
 DestroiTiro:
 	li s7, 300
 	li s6, 0
+	la a0, TIRO_EXECUTA
+	li a1, 0
+	sw a1, 0(a0)
 FimTiro:
 	ret

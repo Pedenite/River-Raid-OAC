@@ -22,6 +22,11 @@ FuelCtrl:	la a0, debug
 		li a4, 0
 		li a7, 101
 		ecall
+		
+		li a0, 1000
+		div a0, s5, a0
+		sub a0, a0, s10
+		
 		la a0, PorCento
 		li a1, 124
 		li a7, 104

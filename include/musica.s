@@ -14,13 +14,13 @@ sub a2, a2, a1
 ##### ESTADO 0 #####
 li a3, 0
 bne a0, a3, MUSICA_ESTADO_1
-li a3, 250
+li a3, 500
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -47,7 +47,7 @@ bltu a2, a3, MUSICA_FIM
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -74,7 +74,7 @@ bltu a2, a3, MUSICA_FIM
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -95,13 +95,13 @@ j MUSICA_FIM
 MUSICA_ESTADO_3:
 li a3, 3
 bne a0, a3, MUSICA_ESTADO_4
-li a3, 125
+li a3, 250
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 52
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -122,13 +122,13 @@ j MUSICA_FIM
 MUSICA_ESTADO_4:
 li a3, 4
 bne a0, a3, MUSICA_ESTADO_5
-li a3, 250
+li a3, 125
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -149,13 +149,13 @@ j MUSICA_FIM
 MUSICA_ESTADO_5:
 li a3, 5
 bne a0, a3, MUSICA_ESTADO_6
-li a3, 125
+li a3, 250
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 52
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -176,13 +176,13 @@ j MUSICA_FIM
 MUSICA_ESTADO_6:
 li a3, 6
 bne a0, a3, MUSICA_ESTADO_7
-li a3, 250
+li a3, 125
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
@@ -201,13 +201,13 @@ j MUSICA_FIM
 
 ##### ESTADO 7 #####
 MUSICA_ESTADO_7:
-li a3, 500
+li a3, 250
 bltu a2, a3, MUSICA_FIM 
 
 li a0, 64
 li a1, 1000
 li a2, 1
-li a3, 200
+li a3, 100
 li a7, 31
 ecall
 
